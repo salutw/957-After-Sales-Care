@@ -756,29 +756,23 @@ button {
   line-height: 1.65;
 }
 
-.assistant-topics {
+.assistant-examples {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 22px;
 }
 
-.assistant-topics button {
-  min-height: 38px;
-  border: 1px solid #cce8e4;
+.assistant-examples span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
   border-radius: 999px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.72);
   color: var(--teal);
-  padding: 0 14px;
+  padding: 0 13px;
   font-weight: 850;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
-}
-
-.assistant-topics button:hover,
-.assistant-topics button.active {
-  background: var(--teal);
-  color: #fff;
-  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px #cce8e4;
 }
 
 .assistant-console {
@@ -1377,7 +1371,7 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .assistant-topics {
+  .assistant-examples {
     display: grid;
   }
 

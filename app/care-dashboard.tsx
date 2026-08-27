@@ -35,26 +35,9 @@ const aiQuestions = [
   '睡眠、精神或腸胃狀況有明顯變化嗎？',
   '是否出現任何不適，或希望顧問優先協助的問題？',
 ];
-const assistantTopics = [
-  {
-    label: '一般食用方式',
-    query: '957 牛樟芝一般怎麼吃？',
-    answer:
-      '一般建議依商品標示與顧問建議使用，可安排在早餐後與晚餐後。若正在服藥，建議與藥品間隔至少 120 分鐘，並以專業醫療建議為準。',
-  },
-  {
-    label: '進階使用方式',
-    query: '我想知道進階使用方式',
-    answer:
-      '進階使用會參考會員訂單、使用天數、回報狀態與生活作息。正式版會由資料庫讀取商品規格與會員紀錄，再由 AI 產生個人化參考建議。',
-  },
-  {
-    label: '建議搭配商品',
-    query: '可以搭配哪些商品？',
-    answer:
-      '搭配商品會依你的保養目標、睡眠、精神與日常飲食狀況判斷。Demo 版先顯示推薦邏輯，正式版會由後台商品資料與 AI 分析產出可參考清單。',
-  },
-];
+const assistantExamples = ['一般食用方式', '進階使用方式', '建議搭配商品'];
+const assistantAnswer =
+  '可以的。關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式，例如建議服用時段、每日建議量與注意事項；若你想了解進階使用，會再參考會員訂單、使用天數、近期健康回報與生活作息，整理更貼近你的使用建議。若問題涉及搭配商品，正式版會由後台商品資料與 AI 分析規則比對你的需求，提供可參考的搭配方向。';
 
 function ProductScene({ compact = false }: { compact?: boolean }) {
   return (
@@ -82,8 +65,7 @@ function PillIcon({ label }: { label: string }) {
 export default function Home() {
   const [completed, setCompleted] = useState(0);
   const [panel, setPanel] = useState<'none' | 'health' | 'advisor'>('none');
-  const [assistantTopic, setAssistantTopic] = useState(assistantTopics[0]);
-  const [assistantQuery, setAssistantQuery] = useState(assistantTopics[0].query);
+  const [assistantQuery, setAssistantQuery] = useState('我想了解 957 牛樟芝怎麼使用？');
   const progress = useMemo(() => completed * 25, [completed]);
 
   return (
@@ -222,20 +204,11 @@ export default function Home() {
               <div className="section-pill">AI 商品小助理</div>
               <h2>想了解商品怎麼使用？</h2>
               <p>
-                可先查詢 957 的一般食用方式、進階使用方式與建議搭配商品。正式版會串接後台商品資料庫，再由 AI 依會員狀態整理參考資訊。
+                使用者可以直接詢問商品問題，由 AI 小助理在回覆中說明一般食用方式、進階使用方式與建議搭配商品。正式版會串接後台商品資料庫，再依會員狀態整理參考資訊。
               </p>
-              <div className="assistant-topics" aria-label="商品資訊查詢類型">
-                {assistantTopics.map((topic) => (
-                  <button
-                    className={assistantTopic.label === topic.label ? 'active' : ''}
-                    key={topic.label}
-                    onClick={() => {
-                      setAssistantTopic(topic);
-                      setAssistantQuery(topic.query);
-                    }}
-                  >
-                    {topic.label}
-                  </button>
+              <div className="assistant-examples" aria-label="AI 小助理可回答的商品資訊">
+                {assistantExamples.map((example) => (
+                  <span key={example}>{example}</span>
                 ))}
               </div>
             </div>
@@ -251,7 +224,7 @@ export default function Home() {
               </label>
               <div className="assistant-answer">
                 <strong>小助理回覆</strong>
-                <p>{assistantTopic.answer}</p>
+                <p>{assistantAnswer}</p>
               </div>
               <small>資料來源預留：商品資料庫、會員訂單、健康回報、AI 分析規則</small>
             </div>
