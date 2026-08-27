@@ -108,7 +108,7 @@ button {
 .step-card,
 .product-card,
 .plan-card,
-.records-card,
+.assistant-card,
 .checkin-card,
 .advisor-band,
 .progress-card,
@@ -566,7 +566,7 @@ button {
 
 .product-card,
 .plan-card,
-.records-card,
+.assistant-card,
 .checkin-card,
 .advisor-band {
   position: relative;
@@ -732,52 +732,117 @@ button {
   font-weight: 700;
 }
 
-.records-card {
+.assistant-card {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(230px, 0.85fr) minmax(260px, 1fr);
+  gap: 26px;
   min-height: 250px;
   padding: 30px;
+  background:
+    radial-gradient(circle at 8% 16%, rgba(9, 161, 145, 0.1), transparent 138px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(239, 251, 248, 0.92));
 }
 
-.list-block {
-  padding-right: 32px;
-  border-right: 1px solid var(--line);
+.assistant-copy h2 {
+  margin: 20px 0 0;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  font-weight: 900;
+  line-height: 1.2;
 }
 
-.list-block button {
+.assistant-copy p {
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.assistant-topics {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 45px;
-  margin-top: 10px;
-  border: 1px solid #e1ecea;
-  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.assistant-topics button {
+  min-height: 38px;
+  border: 1px solid #cce8e4;
+  border-radius: 999px;
   background: #fff;
-  color: var(--ink);
-  padding: 0 16px;
-  font-weight: 750;
+  color: var(--teal);
+  padding: 0 14px;
+  font-weight: 850;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.tag-block {
-  padding-left: 32px;
+.assistant-topics button:hover,
+.assistant-topics button.active {
+  background: var(--teal);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
-.tag-block div:last-child {
+.assistant-console {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 15px;
-  margin-top: 34px;
+  gap: 14px;
+  border: 1px solid #cde8e4;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 22px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 }
 
-.tag-block span {
+.assistant-avatar {
   display: grid;
   place-items: center;
-  min-height: 50px;
-  border-radius: 9px;
-  background: #fff4de;
-  color: #a06519;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #008f83, #42bfb2);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 16px 28px rgba(8, 126, 116, 0.18);
+}
+
+.assistant-console label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
   font-weight: 850;
+}
+
+.assistant-console input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfefe;
+  padding: 0 14px;
+  color: var(--ink);
+}
+
+.assistant-answer {
+  border-radius: 10px;
+  background: #eefaf7;
+  padding: 14px 16px;
+}
+
+.assistant-answer strong {
+  display: block;
+  color: var(--teal);
+  font-size: 15px;
+}
+
+.assistant-answer p {
+  margin: 8px 0 0;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+.assistant-console small {
+  color: #7b8998;
+  font-weight: 750;
+  line-height: 1.5;
 }
 
 .checkin-card {
@@ -1074,7 +1139,7 @@ footer {
   .dashboard-grid,
   .product-card,
   .plan-card,
-  .records-card,
+  .assistant-card,
   .advisor-band {
     grid-template-columns: 1fr;
   }
@@ -1137,7 +1202,7 @@ footer {
 
   .product-card,
   .plan-card,
-  .records-card,
+  .assistant-card,
   .checkin-card,
   .advisor-band {
     padding: 26px;
@@ -1170,19 +1235,12 @@ footer {
   }
 
   .timeline,
-  .tag-block div:last-child,
   .advisor-band ul {
     grid-template-columns: 1fr 1fr;
   }
 
-  .list-block,
-  .tag-block {
-    border: 0;
-    padding: 0;
-  }
-
-  .records-card {
-    gap: 28px;
+  .assistant-card {
+    gap: 20px;
   }
 
   .checkin-actions {
@@ -1275,7 +1333,7 @@ footer {
 
   .product-card,
   .plan-card,
-  .records-card,
+  .assistant-card,
   .checkin-card,
   .advisor-band {
     border-radius: 10px;
@@ -1315,9 +1373,16 @@ footer {
 
   .usage-boxes,
   .timeline,
-  .tag-block div:last-child,
   .advisor-band ul {
     grid-template-columns: 1fr;
+  }
+
+  .assistant-topics {
+    display: grid;
+  }
+
+  .assistant-console {
+    padding: 18px;
   }
 
   .floating-panel {

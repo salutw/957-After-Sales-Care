@@ -29,13 +29,31 @@ const onboardingSteps = [
   },
 ];
 
-const records = ['查看健康檔案', '更新近期狀況', '上傳健檢報告'];
-const tags = ['睡眠品質不佳', '白天精神較差', '改善疲勞', '睡眠支持'];
 const timeline = ['服用提醒', '計畫追蹤', '數據記錄', '專業關懷'];
 const aiQuestions = [
   '最近 7 天是否都有依建議服用？',
   '睡眠、精神或腸胃狀況有明顯變化嗎？',
   '是否出現任何不適，或希望顧問優先協助的問題？',
+];
+const assistantTopics = [
+  {
+    label: '一般食用方式',
+    query: '957 牛樟芝一般怎麼吃？',
+    answer:
+      '一般建議依商品標示與顧問建議使用，可安排在早餐後與晚餐後。若正在服藥，建議與藥品間隔至少 120 分鐘，並以專業醫療建議為準。',
+  },
+  {
+    label: '進階使用方式',
+    query: '我想知道進階使用方式',
+    answer:
+      '進階使用會參考會員訂單、使用天數、回報狀態與生活作息。正式版會由資料庫讀取商品規格與會員紀錄，再由 AI 產生個人化參考建議。',
+  },
+  {
+    label: '建議搭配商品',
+    query: '可以搭配哪些商品？',
+    answer:
+      '搭配商品會依你的保養目標、睡眠、精神與日常飲食狀況判斷。Demo 版先顯示推薦邏輯，正式版會由後台商品資料與 AI 分析產出可參考清單。',
+  },
 ];
 
 function ProductScene({ compact = false }: { compact?: boolean }) {
@@ -63,7 +81,9 @@ function PillIcon({ label }: { label: string }) {
 
 export default function Home() {
   const [completed, setCompleted] = useState(0);
-  const [panel, setPanel] = useState<'none' | 'ai' | 'advisor'>('none');
+  const [panel, setPanel] = useState<'none' | 'health' | 'advisor'>('none');
+  const [assistantTopic, setAssistantTopic] = useState(assistantTopics[0]);
+  const [assistantQuery, setAssistantQuery] = useState(assistantTopics[0].query);
   const progress = useMemo(() => completed * 25, [completed]);
 
   return (
@@ -197,23 +217,43 @@ export default function Home() {
             </div>
           </article>
 
-          <article className="records-card">
-            <div className="list-block">
-              <div className="section-pill">健康追蹤</div>
-              {records.map((item) => (
-                <button key={item}>
-                  {item}
-                  <span>›</span>
-                </button>
-              ))}
-            </div>
-            <div className="tag-block">
-              <div className="section-pill">檔案與回報</div>
-              <div>
-                {tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
+          <article className="assistant-card">
+            <div className="assistant-copy">
+              <div className="section-pill">AI 商品小助理</div>
+              <h2>想了解商品怎麼使用？</h2>
+              <p>
+                可先查詢 957 的一般食用方式、進階使用方式與建議搭配商品。正式版會串接後台商品資料庫，再由 AI 依會員狀態整理參考資訊。
+              </p>
+              <div className="assistant-topics" aria-label="商品資訊查詢類型">
+                {assistantTopics.map((topic) => (
+                  <button
+                    className={assistantTopic.label === topic.label ? 'active' : ''}
+                    key={topic.label}
+                    onClick={() => {
+                      setAssistantTopic(topic);
+                      setAssistantQuery(topic.query);
+                    }}
+                  >
+                    {topic.label}
+                  </button>
                 ))}
               </div>
+            </div>
+            <div className="assistant-console">
+              <div className="assistant-avatar">AI</div>
+              <label>
+                <span>輸入想查詢的商品問題</span>
+                <input
+                  value={assistantQuery}
+                  onChange={(event) => setAssistantQuery(event.target.value)}
+                  placeholder="例如：我適合什麼時間吃？"
+                />
+              </label>
+              <div className="assistant-answer">
+                <strong>小助理回覆</strong>
+                <p>{assistantTopic.answer}</p>
+              </div>
+              <small>資料來源預留：商品資料庫、會員訂單、健康回報、AI 分析規則</small>
             </div>
           </article>
 
@@ -222,12 +262,12 @@ export default function Home() {
             <h2>最近 7 天，您的狀況如何？</h2>
             <p>持續回報有助於我們提供更精準的關懷與建議。</p>
             <div className="checkin-actions">
-              <button className="good" onClick={() => setPanel('ai')}>
+              <button className="good" onClick={() => setPanel('health')}>
                 <span>✓</span>
                 <strong>狀況穩定</strong>
                 一切都很好
               </button>
-              <button className="help" onClick={() => setPanel('ai')}>
+              <button className="help" onClick={() => setPanel('health')}>
                 <span>♡</span>
                 <strong>我有不適</strong>
                 需要協助
@@ -262,9 +302,9 @@ export default function Home() {
           <button className="close-button" onClick={() => setPanel('none')} aria-label="關閉">
             ×
           </button>
-          {panel === 'ai' ? (
+          {panel === 'health' ? (
             <>
-              <div className="section-pill">AI 問答表單</div>
+              <div className="section-pill">AI 健康問答表單</div>
               <h2>健康回報</h2>
               <p>Demo 版先呈現問答流程，正式版會寫入會員健康紀錄並觸發顧問派單規則。</p>
               <div className="question-stack">
