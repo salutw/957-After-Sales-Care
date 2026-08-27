@@ -63,17 +63,17 @@ function PillIcon({ label }: { label: string }) {
 
 export default function Home() {
   const [completed, setCompleted] = useState(0);
-  const [panel, setPanel] = useState<'none' | 'ai' | 'advisor'>('ai');
+  const [panel, setPanel] = useState<'none' | 'ai' | 'advisor'>('none');
   const progress = useMemo(() => completed * 25, [completed]);
 
   return (
     <main className="min-h-screen bg-[#f8fbfa] text-[#0f2240]">
-      <header className="mx-auto flex h-20 w-full max-w-[1540px] items-center justify-between px-5 md:px-8">
+      <header className="site-header mx-auto flex h-20 w-full max-w-[1540px] items-center justify-between px-5 md:px-8">
         <div className="flex items-center gap-3">
           <div className="brand-mark">
             <span />
           </div>
-          <strong className="text-xl font-bold tracking-normal md:text-2xl">
+          <strong className="brand-title text-xl font-bold tracking-normal md:text-2xl">
             957 After-Sales Care
           </strong>
         </div>
