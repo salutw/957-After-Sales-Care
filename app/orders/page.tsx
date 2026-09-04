@@ -33,6 +33,8 @@ export default function OrdersPage() {
   });
   const [showOrderDetailModal, setShowOrderDetailModal] = useState(false);
   const [selectedOrderDetail, setSelectedOrderDetail] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [platformFilter, setPlatformFilter] = useState('all');
 
   // 檢查URL參數，如果有showAddModal=true則自動打開新增視窗
   useEffect(() => {
@@ -165,6 +167,12 @@ export default function OrdersPage() {
     setShowOrderDetailModal(true);
   };
 
+  const filteredOrders = orders.filter((order) => {
+    const matchStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchPlatform = platformFilter === 'all' || order.platform === platformFilter;
+    return matchStatus && matchPlatform;
+  });
+
   return (
     <main className="min-h-screen bg-[#f8fbfa]">
       <header className="site-header mx-auto flex h-20 w-full max-w-[1540px] items-center justify-between px-5 md:px-8">
@@ -212,8 +220,32 @@ export default function OrdersPage() {
           </div>
         )}
 
+        <div className="flex flex-wrap gap-3 mb-4">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-[#d9e7e5] rounded-lg bg-white text-[#0f2240] text-sm focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+          >
+            <option value="all">全部狀態</option>
+            <option value="已歸戶">已歸戶</option>
+            <option value="待歸戶">待歸戶</option>
+            <option value="pending">待處理</option>
+          </select>
+          <select
+            value={platformFilter}
+            onChange={(e) => setPlatformFilter(e.target.value)}
+            className="px-4 py-2 border border-[#d9e7e5] rounded-lg bg-white text-[#0f2240] text-sm focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+          >
+            <option value="all">全部平台</option>
+            <option value="蝦皮��">蝦皮</option>
+            <option value="官網">官網</option>
+            <option value="MOMO">MOMO</option>
+            <option value="PChome">PChome</option>
+          </select>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] overflow-hidden">
-          <div className="overflow-x-auto md:overflow-visible">
+          <div className="overflow-x-auto md:overflow-visible mobile-table-scroll">
             <table className="w-full mobile-card-table">
               <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5] hidden md:table-header-group">
                 <tr>
@@ -229,7 +261,7 @@ export default function OrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id} className="border-b border-[#d9e7e5] hover:bg-gray-50 md:table-row">
                     <td data-label="系統序號" className="px-6 py-4 text-sm text-[#0f2240] font-medium">{order.id}</td>
                     <td data-label="用戶訂單編號" className="px-6 py-4 text-sm text-[#637082]">{order.orderNumber}</td>
