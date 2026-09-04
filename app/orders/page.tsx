@@ -168,8 +168,10 @@ export default function OrdersPage() {
   };
 
   const filteredOrders = orders.filter((order) => {
-    const matchStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchPlatform = platformFilter === 'all' || order.platform === platformFilter;
+    const orderStatus = (order.status || '').toString().trim();
+    const orderPlatform = (order.platform || '').toString().trim();
+    const matchStatus = statusFilter === 'all' || orderStatus.toLowerCase() === statusFilter.toLowerCase();
+    const matchPlatform = platformFilter === 'all' || orderPlatform.toLowerCase() === platformFilter.toLowerCase();
     return matchStatus && matchPlatform;
   });
 
@@ -227,8 +229,7 @@ export default function OrdersPage() {
             className="px-4 py-2 border border-[#d9e7e5] rounded-lg bg-white text-[#0f2240] text-sm focus:outline-none focus:ring-2 focus:ring-[#087e74]"
           >
             <option value="all">全部狀態</option>
-            <option value="已歸戶">已歸戶</option>
-            <option value="待歸戶">待歸戶</option>
+            <option value="linked">已歸戶</option>
             <option value="pending">待處理</option>
           </select>
           <select
@@ -237,10 +238,9 @@ export default function OrdersPage() {
             className="px-4 py-2 border border-[#d9e7e5] rounded-lg bg-white text-[#0f2240] text-sm focus:outline-none focus:ring-2 focus:ring-[#087e74]"
           >
             <option value="all">全部平台</option>
-            <option value="蝦皮��">蝦皮</option>
-            <option value="官網">官網</option>
-            <option value="MOMO">MOMO</option>
-            <option value="PChome">PChome</option>
+            {Array.from(new Set(orders.map((order) => (order.platform || '').trim()).filter(Boolean))).sort().map((platform) => (
+              <option key={platform} value={platform}>{platform}</option>
+            ))}
           </select>
         </div>
 
