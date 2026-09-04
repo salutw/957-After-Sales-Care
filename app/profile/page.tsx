@@ -5,6 +5,7 @@ import { validateProfile, getErrorMessage } from '@/lib/validation';
 import { mockApiService, mockUsers } from '@/lib/mock-data';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
+import MainNav from '../components/MainNav';
 
 export default function ProfilePage() {
   const { user, updateUser, setLineBound } = useAuth();
@@ -154,13 +155,7 @@ export default function ProfilePage() {
           </strong>
         </div>
         <div className="flex items-center gap-4 text-sm font-semibold">
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="text-[#087e74] hover:underline"
-          >
-            返回儀表板
-          </button>
-          <button 
+<button 
             onClick={() => {
               // 使用 AuthContext 的 logout
               window.location.href = '/auth/login';
@@ -171,6 +166,8 @@ export default function ProfilePage() {
           </button>
         </div>
       </header>
+
+      <MainNav />
 
       <div className="mx-auto w-full max-w-[1540px] px-5 pb-8 md:px-8">
         <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-8 mt-8">

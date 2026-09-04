@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import MainNav from './components/MainNav';
 
 const onboardingSteps = [
   {
@@ -177,47 +178,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto flex w-full max-w-[1540px] flex-col gap-6 px-5 pb-8 md:px-8">
-        {/* Navigation */}
-        <nav className="bg-white rounded-xl shadow-sm border border-[#d9e7e5] p-4">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button 
-              onClick={() => window.location.href = '/'}
-              className="px-4 py-2 rounded-lg bg-[#087e74] text-white font-semibold text-sm"
-            >
-              儀表板
-            </button>
-            <button 
-              onClick={() => window.location.href = '/orders'}
-              className="px-4 py-2 rounded-lg hover:bg-[#f8fbfa] text-[#0f2240] font-semibold text-sm transition"
-            >
-              訂單管理
-            </button>
-            <button 
-              onClick={() => window.location.href = '/health'}
-              className="px-4 py-2 rounded-lg hover:bg-[#f8fbfa] text-[#0f2240] font-semibold text-sm transition"
-            >
-              健康記錄
-            </button>
-            <button 
-              onClick={() => window.location.href = '/advisor'}
-              className="px-4 py-2 rounded-lg hover:bg-[#f8fbfa] text-[#0f2240] font-semibold text-sm transition"
-            >
-              顧問諮詢
-            </button>
-            <button 
-              onClick={() => window.location.href = '/profile'}
-              className="px-4 py-2 rounded-lg hover:bg-[#f8fbfa] text-[#0f2240] font-semibold text-sm transition"
-            >
-              個人資料
-            </button>
-            <button 
-              onClick={() => window.location.href = '/admin'}
-              className="px-4 py-2 rounded-lg hover:bg-[#f8fbfa] text-[#637082] font-semibold text-sm transition"
-            >
-              管理後台
-            </button>
-          </div>
-        </nav>
+        <MainNav />
 
         <section className="hero-shell">
           <div className="hero-plant plant-left" />

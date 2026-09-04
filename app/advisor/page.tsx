@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockApiService, mockAdvisorCases } from '@/lib/mock-data';
 import { validateAdvisorCase, getErrorMessage } from '@/lib/validation';
+import MainNav from '../components/MainNav';
 
 export default function AdvisorPage() {
   const { user } = useAuth();
@@ -92,14 +93,10 @@ export default function AdvisorPage() {
           </strong>
         </div>
         <div className="flex items-center gap-4 text-sm font-semibold">
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="text-[#087e74] hover:underline"
-          >
-            返回儀表板
-          </button>
-        </div>
+</div>
       </header>
+
+      <MainNav />
 
       <div className="mx-auto w-full max-w-[1540px] px-5 pb-8 md:px-8">
         <div className="flex justify-between items-center mt-8 mb-6">
