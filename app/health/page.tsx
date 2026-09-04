@@ -177,9 +177,9 @@ export default function HealthPage() {
           <div className="p-6 border-b border-[#d9e7e5]">
             <h2 className="text-xl font-bold text-[#0f2240]">健康回報記錄</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5]">
+          <div className="overflow-x-auto md:overflow-visible">
+            <table className="w-full mobile-card-table">
+              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5] hidden md:table-header-group">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">日期</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">類型</th>
@@ -190,10 +190,10 @@ export default function HealthPage() {
               </thead>
               <tbody>
                 {healthRecords.map((record) => (
-                  <tr key={record.id} className="border-b border-[#d9e7e5] hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-[#0f2240]">{record.date}</td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{record.type}</td>
-                    <td className="px-6 py-4">
+                  <tr key={record.id} className="border-b border-[#d9e7e5] hover:bg-gray-50 md:table-row">
+                    <td data-label="日期" className="px-6 py-4 text-sm text-[#0f2240]">{record.date}</td>
+                    <td data-label="類型" className="px-6 py-4 text-sm text-[#637082]">{record.type}</td>
+                    <td data-label="狀態" className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         record.status === '穩定' || record.status === '已完成'
                           ? 'bg-[#e7f1fa] text-[#32617f]' 
@@ -202,8 +202,8 @@ export default function HealthPage() {
                         {record.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-[#637082] max-w-xs truncate">{record.notes}</td>
-                    <td className="px-6 py-4">
+                    <td data-label="備註" className="px-6 py-4 text-sm text-[#637082] max-w-xs truncate md:max-w-xs md:truncate">{record.notes}</td>
+                    <td data-label="操作" className="px-6 py-4">
                       <button className="text-[#087e74] font-semibold hover:underline text-sm">
                         查看詳情
                       </button>

@@ -172,9 +172,9 @@ export default function AdvisorPage() {
           <div className="p-6 border-b border-[#d9e7e5]">
             <h2 className="text-xl font-bold text-[#0f2240]">諮詢案件記錄</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5]">
+          <div className="overflow-x-auto md:overflow-visible">
+            <table className="w-full mobile-card-table">
+              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5] hidden md:table-header-group">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">案件編號</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">日期</th>
@@ -188,12 +188,12 @@ export default function AdvisorPage() {
               </thead>
               <tbody>
                 {cases.map((caseItem) => (
-                  <tr key={caseItem.id} className="border-b border-[#d9e7e5] hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-[#0f2240] font-medium">{caseItem.id}</td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{caseItem.date}</td>
-                    <td className="px-6 py-4 text-sm text-[#0f2240]">{caseItem.type}</td>
-                    <td className="px-6 py-4 text-sm text-[#0f2240] max-w-xs truncate">{caseItem.subject}</td>
-                    <td className="px-6 py-4">
+                  <tr key={caseItem.id} className="border-b border-[#d9e7e5] hover:bg-gray-50 md:table-row">
+                    <td data-label="案件編號" className="px-6 py-4 text-sm text-[#0f2240] font-medium">{caseItem.id}</td>
+                    <td data-label="日期" className="px-6 py-4 text-sm text-[#637082]">{caseItem.date}</td>
+                    <td data-label="類型" className="px-6 py-4 text-sm text-[#0f2240]">{caseItem.type}</td>
+                    <td data-label="主旨" className="px-6 py-4 text-sm text-[#0f2240] max-w-xs truncate md:max-w-xs md:truncate">{caseItem.subject}</td>
+                    <td data-label="優先級" className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         caseItem.priority === '高' 
                           ? 'bg-[#fff7ed] text-[#c45b2b]' 
@@ -202,8 +202,8 @@ export default function AdvisorPage() {
                         {caseItem.priority}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{caseItem.advisor}</td>
-                    <td className="px-6 py-4">
+                    <td data-label="負責顧問" className="px-6 py-4 text-sm text-[#637082]">{caseItem.advisor}</td>
+                    <td data-label="狀態" className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         caseItem.status === '處理中' 
                           ? 'bg-[#fff7ed] text-[#c45b2b]' 
@@ -214,7 +214,7 @@ export default function AdvisorPage() {
                         {caseItem.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td data-label="操作" className="px-6 py-4">
                       <button className="text-[#087e74] font-semibold hover:underline text-sm">
                         查看詳情
                       </button>

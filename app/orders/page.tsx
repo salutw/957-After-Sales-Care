@@ -213,9 +213,9 @@ export default function OrdersPage() {
         )}
 
         <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5]">
+          <div className="overflow-x-auto md:overflow-visible">
+            <table className="w-full mobile-card-table">
+              <thead className="bg-[#f8fbfa] border-b border-[#d9e7e5] hidden md:table-header-group">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">系統序號</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2240]">用戶訂單編號</th>
@@ -230,15 +230,15 @@ export default function OrdersPage() {
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="border-b border-[#d9e7e5] hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-[#0f2240] font-medium">{order.id}</td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{order.orderNumber}</td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{order.date}</td>
-                    <td className="px-6 py-4 text-sm text-[#0f2240]">{order.product}</td>
-                    <td className="px-6 py-4 text-sm text-[#0f2240]">{order.quantity}</td>
-                    <td className="px-6 py-4 text-sm text-[#0f2240]">NT${order.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-[#637082]">{order.platform}</td>
-                    <td className="px-6 py-4">
+                  <tr key={order.id} className="border-b border-[#d9e7e5] hover:bg-gray-50 md:table-row">
+                    <td data-label="系統序號" className="px-6 py-4 text-sm text-[#0f2240] font-medium">{order.id}</td>
+                    <td data-label="用戶訂單編號" className="px-6 py-4 text-sm text-[#637082]">{order.orderNumber}</td>
+                    <td data-label="日期" className="px-6 py-4 text-sm text-[#637082]">{order.date}</td>
+                    <td data-label="商品" className="px-6 py-4 text-sm text-[#0f2240]">{order.product}</td>
+                    <td data-label="數量" className="px-6 py-4 text-sm text-[#0f2240]">{order.quantity}</td>
+                    <td data-label="金額" className="px-6 py-4 text-sm text-[#0f2240]">NT${order.amount.toLocaleString()}</td>
+                    <td data-label="平台" className="px-6 py-4 text-sm text-[#637082]">{order.platform}</td>
+                    <td data-label="狀態" className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         order.status === '已歸戶' 
                           ? 'bg-[#e7f1fa] text-[#32617f]' 
@@ -247,7 +247,7 @@ export default function OrdersPage() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td data-label="操作" className="px-6 py-4">
                       {order.status === '待歸戶' ? (
                         <button
                           onClick={() => handleLinkOrder(order)}

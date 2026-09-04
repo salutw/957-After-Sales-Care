@@ -1763,3 +1763,70 @@ footer {
     font-size: 1.1rem;
   }
 }
+
+/* Mobile card table styles */
+@media (max-width: 640px) {
+  .mobile-card-table {
+    border-collapse: separate;
+    border-spacing: 0 12px;
+  }
+
+  .mobile-card-table thead {
+    display: none;
+  }
+
+  .mobile-card-table tbody {
+    display: block;
+  }
+
+  .mobile-card-table tbody tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    padding: 14px;
+    box-shadow: 0 4px 12px rgba(15, 34, 64, 0.05);
+  }
+
+  .mobile-card-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .mobile-card-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f4f3;
+    text-align: right;
+  }
+
+  .mobile-card-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-card-table tbody td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: left;
+    margin-right: 16px;
+    min-width: 5em;
+  }
+
+  .mobile-card-table tbody td > * {
+    flex: 1;
+    text-align: right;
+    justify-content: flex-end;
+  }
+
+  .mobile-card-table tbody td .truncate,
+  .mobile-card-table tbody td .max-w-xs {
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
