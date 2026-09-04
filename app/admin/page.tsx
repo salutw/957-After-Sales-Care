@@ -157,6 +157,7 @@ export default function AdminPage() {
   const [adminAccounts, setAdminAccounts] = useState([]);
   const [showEditAdminModal, setShowEditAdminModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // 從 localStorage 載入管理員帳號
   useEffect(() => {
@@ -643,13 +644,41 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#f8fbfa] flex">
+    <main className="min-h-screen bg-[#f8fbfa] flex relative">
+      {/* 手機版頂部選單按鈕 */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-md border-b border-[#d9e7e5] px-4 py-3 flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[#0f2240]">珈明國際</h1>
+          <p className="text-xs text-[#637082]">957 After-Sales Care</p>
+        </div>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 rounded-lg bg-[#f8fbfa] text-[#0f2240] border border-[#d9e7e5]"
+          aria-label="切換選單"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
       {/* 左側選單 */}
-      <aside className="w-64 bg-white shadow-lg border-r border-[#d9e7e5] p-6 flex flex-col">
+      <aside className={`${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white shadow-lg md:shadow-none border-r border-[#d9e7e5] p-6 flex flex-col transition-transform duration-300 ease-in-out`}>
         {/* 公司標題 */}
-        <div className="mb-8">
+        <div className="mb-8 hidden md:block">
           <h1 className="text-2xl font-bold text-[#0f2240]">珈明國際</h1>
           <p className="text-sm text-[#637082] mt-1">957 After-Sales Care</p>
+        </div>
+
+        {/* 手機版關閉按鈕 */}
+        <div className="md:hidden flex justify-end mb-4">
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 rounded-lg bg-[#f8fbfa] text-[#637082]"
+            aria-label="關閉選單"
+          >
+            ✕
+          </button>
         </div>
 
         {/* 管理員資訊 */}
@@ -696,7 +725,10 @@ export default function AdminPage() {
           .map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-semibold transition ${
                 activeTab === item.id
                   ? 'bg-[#087e74] text-white'
@@ -731,8 +763,16 @@ export default function AdminPage() {
         </div>
       </aside>
 
+      {/* 手機版選單遮罩 */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-black bg-opacity-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       {/* 主要內容區 */}
-      <div className="flex-1 p-8">
+      <div className="admin-content flex-1 p-4 md:p-8 pt-20 md:pt-8">
         <div className="max-w-[1400px] mx-auto">
 
         {activeTab === 'dashboard' && (
