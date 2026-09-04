@@ -238,9 +238,10 @@ export default function OrdersPage() {
             className="px-4 py-2 border border-[#d9e7e5] rounded-lg bg-white text-[#0f2240] text-sm focus:outline-none focus:ring-2 focus:ring-[#087e74]"
           >
             <option value="all">全部平台</option>
-            {Array.from(new Set(orders.map((order) => (order.platform || '').trim()).filter(Boolean))).sort().map((platform) => (
-              <option key={platform} value={platform}>{platform}</option>
-            ))}
+            <option value="蝦皮">蝦皮</option>
+            <option value="官方網站">官方網站</option>
+            <option value="Momo">Momo</option>
+            <option value="PChome">PChome</option>
           </select>
         </div>
 
