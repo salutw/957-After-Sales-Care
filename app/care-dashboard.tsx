@@ -255,52 +255,69 @@ export default function Home() {
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-8 md:px-8">
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white to-[#e8f8f3] border border-[#d9e7e5]">
-          <div className="grid md:grid-cols-2 gap-8 p-8 md:p-12">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7fbfa] via-white to-[#e8f8f3] border border-[#d9e7e5]">
+          <div className="grid lg:grid-cols-3 gap-8 p-8 md:p-12">
             {/* Left Content */}
-            <div className="flex flex-col justify-center">
+            <div className="lg:col-span-1 flex flex-col justify-center">
               <p className="text-sm font-semibold text-[#008f7a] tracking-wider mb-2">CARE EVERYDAY, A BETTER TOMORROW</p>
               <h1 className="text-4xl md:text-5xl font-bold text-[#063b59] mb-4 leading-tight">
                 你的售後健康服務<br />我們一直都在
               </h1>
               <p className="text-lg text-[#637082] mb-8 leading-relaxed">
-                完成身份綁定與服務設定，這裡會整理商品使用方式、<br />
+                完成身份綁定與服務設定，這裡會整理由你你使用方式、<br />
                 每日計畫、健康追蹤與專屬關懷服務。
               </p>
               <div className="flex gap-4 mb-8">
                 <button
-                  className="px-8 py-4 bg-[#008f7a] text-white rounded-xl font-semibold text-lg hover:opacity-90 transition flex items-center gap-2"
+                  className="px-8 py-4 bg-[#008f7a] text-white rounded-xl font-semibold text-lg hover:opacity-90 transition flex items-center gap-2 shadow-lg"
                   onClick={handlePrimaryStart}
                 >
                   開始設定 <span>→</span>
                 </button>
                 <button className="px-8 py-4 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold text-lg hover:bg-[#dff4f0] transition flex items-center gap-2">
-                  了解更多 <span className="w-5 h-5 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-xs">i</span>
+                  了解更多 <span className="w-5 h-5 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-xs">▶</span>
                 </button>
               </div>
-              <div className="flex gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">✓</div>
-                  <span className="text-sm font-semibold text-[#063b59]">專業團隊把關</span>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#063b59]">專業團隊把關</p>
+                    <p className="text-xs text-[#637082]">安心有保障</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">✓</div>
-                  <span className="text-sm font-semibold text-[#063b59]">持續關懷服務</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#063b59]">持續關懷服務</p>
+                    <p className="text-xs text-[#637082]">陪伴每一天</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">✓</div>
-                  <span className="text-sm font-semibold text-[#063b59]">用科學守護健康</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#dff4f0] flex items-center justify-center text-[#008f7a]">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#063b59]">用科學守護健康</p>
+                    <p className="text-xs text-[#637082]">打造更好的自己</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Content - Product Image */}
-            <div className="relative flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#e8f8f3] to-white rounded-full opacity-50 blur-3xl" />
+            {/* Middle - Product Image */}
+            <div className="lg:col-span-1 relative flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-64 h-64 bg-gradient-to-br from-[#e8f8f3] to-white rounded-full opacity-60" />
+              </div>
               {homepageImage ? (
-                <div className="relative z-10">
-                  <img src={homepageImage} alt="產品圖" className="max-h-80 object-contain rounded-2xl shadow-2xl" />
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-4 py-2 shadow-lg flex gap-4">
+                <div className="relative z-10 flex flex-col items-center">
+                  <img src={homepageImage} alt="產品圖" className="max-h-72 object-contain rounded-2xl shadow-2xl mb-4" />
+                  <div className="bg-white/80 backdrop-blur rounded-full px-4 py-2 shadow-lg flex flex-wrap justify-center gap-3">
                     <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 調節機能</span>
                     <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 增強保護力</span>
                     <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 每日健康守護</span>
@@ -323,36 +340,38 @@ export default function Home() {
                 </div>
               )}
             </div>
-          </div>
-        </section>
 
-        {/* Progress Card */}
-        <section className="bg-white rounded-3xl border border-[#d9e7e5] p-8">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-[#e8f8f3] flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#637082]">啟用進度</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-[#063b59]">{progress}%</span>
-                  <span className={`text-sm font-semibold ${isActivated ? 'text-[#008f7a]' : 'text-[#637082]'}`}>
-                    {isActivated ? '已完成' : `已完成 ${effectiveCompleted}/4`}
-                  </span>
+            {/* Right - Progress Card */}
+            <div className="lg:col-span-1 flex items-center">
+              <div className="bg-white rounded-3xl border border-[#d9e7e5] p-6 w-full shadow-lg">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-[#e8f8f3] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                  </div>
+                  <span className="font-semibold text-[#063b59]">啟用進度</span>
                 </div>
+                <div className="flex items-center justify-center mb-4">
+                  <div className="relative w-32 h-32">
+                    <svg className="w-32 h-32 transform -rotate-90">
+                      <circle cx="64" cy="64" r="56" stroke="#e8f8f3" strokeWidth="12" fill="none" />
+                      <circle cx="64" cy="64" r="56" stroke="#008f7a" strokeWidth="12" fill="none" strokeDasharray={`${2 * Math.PI * 56}`} strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress / 100)}`} strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-3xl font-bold text-[#063b59]">{progress}%</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-sm text-[#637082] mb-2">
+                  {isActivated ? '已完成' : `已完成 ${effectiveCompleted}/4 個步驟`}
+                </p>
+                <p className="text-center text-sm font-semibold text-[#063b59] mb-4">
+                  {isActivated ? '太棒了！你的售後健康服務已準備就緒' : '完成步驟即可啟用服務'}
+                </p>
+                <button className="w-full py-3 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold hover:bg-[#dff4f0] transition">
+                  查看我的設定 →
+                </button>
               </div>
             </div>
-            <div className="flex-1 w-full">
-              <div className="w-full bg-[#e8f8f3] rounded-full h-3">
-                <div className="bg-gradient-to-r from-[#008f7a] to-[#00a896] h-3 rounded-full transition-all" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-            <button className="px-6 py-3 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold hover:bg-[#dff4f0] transition whitespace-nowrap">
-              查看我的設定 →
-            </button>
           </div>
         </section>
 
@@ -360,6 +379,8 @@ export default function Home() {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {onboardingSteps.map((step, index) => {
             const isStepCompleted = getStepStatus(index);
+            const iconColors = ['bg-[#06c755]', 'bg-[#3b82f6]', 'bg-[#ff8a5c]', 'bg-[#8b5cf6]'];
+            const iconBgs = ['bg-[#e7f9f0]', 'bg-[#eff6ff]', 'bg-[#fff7ed]', 'bg-[#f3f0ff]'];
             return (
               <article 
                 className={`bg-white rounded-2xl border-2 p-6 cursor-pointer transition hover:shadow-lg ${
@@ -369,8 +390,8 @@ export default function Home() {
                 onClick={() => handleStepClick(index)}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#e8f8f3] flex items-center justify-center">
-                    <span className="text-lg font-bold text-[#008f7a]">{String(index + 1).padStart(2, '0')}</span>
+                  <div className={`w-12 h-12 rounded-xl ${iconBgs[index]} flex items-center justify-center`}>
+                    <span className={`text-lg font-bold ${iconColors[index].replace('bg-', 'text-')}`}>{String(index + 1).padStart(2, '0')}</span>
                   </div>
                   {isStepCompleted && (
                     <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
