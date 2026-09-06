@@ -1859,7 +1859,8 @@ footer {
   max-height: 75%;
   max-width: 75%;
   object-fit: contain;
-  border-radius: 12px;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 20px 40px rgba(38, 85, 81, 0.15));
 }
 
 .product-scene.compact .product-image {
@@ -1867,4 +1868,6 @@ footer {
   bottom: 20px;
   max-height: 85%;
   max-width: 85%;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 12px 24px rgba(38, 85, 81, 0.1));
 }
