@@ -11,7 +11,12 @@ const onboardingSteps = [
     text: '接收專屬訊息、提醒與追蹤',
     subtext: '現況追蹤綁定',
     action: '開始綁定',
-    icon: '💬',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        <text x="12" y="16" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">LINE</text>
+      </svg>
+    ),
     color: 'bg-[#06c755]',
     bg: 'bg-[#e7f9f0]',
   },
@@ -20,7 +25,12 @@ const onboardingSteps = [
     text: '驗證購買人身份',
     subtext: '保護會員權益',
     action: '手機驗證',
-    icon: '📱',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="7" y="2" width="10" height="20" rx="2" />
+        <line x1="11" y1="18" x2="13" y2="18" />
+      </svg>
+    ),
     color: 'bg-[#3b82f6]',
     bg: 'bg-[#eff6ff]',
   },
@@ -29,7 +39,13 @@ const onboardingSteps = [
     text: '比對購買記錄並啟用',
     subtext: '售後服務',
     action: '訂單歸戶',
-    icon: '📄',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
+    ),
     color: 'bg-[#ff8a5c]',
     bg: 'bg-[#fff7ed]',
   },
@@ -38,7 +54,15 @@ const onboardingSteps = [
     text: '建立個人健康檔案',
     subtext: '提供專屬保健建議',
     action: '開始評估',
-    icon: '🤖',
+    icon: (
+      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="4" y="4" width="16" height="16" rx="4" />
+        <circle cx="9" cy="10" r="1.5" />
+        <circle cx="15" cy="10" r="1.5" />
+        <path d="M9 15c.85.63 1.885 1 3 1s2.15-.37 3-1" />
+        <path d="M8 4v-2M16 4v-2" />
+      </svg>
+    ),
     color: 'bg-[#8b5cf6]',
     bg: 'bg-[#f3f0ff]',
   },
@@ -424,8 +448,8 @@ export default function Home() {
                 <div className="absolute top-4 right-4 text-sm font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</div>
                 
                 {/* Icon */}
-                <div className={`w-14 h-14 rounded-2xl ${step.bg} flex items-center justify-center mb-4`}>
-                  <span className="text-2xl">{step.icon}</span>
+                <div className={`w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center mb-4 text-white`}>
+                  {step.icon}
                 </div>
                 
                 <h3 className="text-lg font-bold text-[#063b59] mb-2">{step.title}</h3>
