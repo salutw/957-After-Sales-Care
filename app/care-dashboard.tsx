@@ -3,35 +3,44 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import MainNav from './components/MainNav';
 
 const onboardingSteps = [
   {
     title: '綁定 LINE',
-    text: '接收關懷回覆、提醒與追蹤通知。',
+    text: '接收專屬訊息、提醒與追蹤',
+    subtext: '現況追蹤綁定',
     action: '開始綁定',
-    icon: 'LINE',
-    color: '#06c755',
+    icon: '💬',
+    color: 'bg-[#06c755]',
+    bg: 'bg-[#e7f9f0]',
   },
   {
     title: '手機驗證',
-    text: '確認購買人身份，保護會員權益。',
+    text: '驗證購買人身份',
+    subtext: '保護會員權益',
     action: '手機驗證',
-    icon: 'TEL',
-    color: '#008f7a',
+    icon: '📱',
+    color: 'bg-[#3b82f6]',
+    bg: 'bg-[#eff6ff]',
   },
   {
     title: '訂單歸戶',
-    text: '比對購買記錄並啟用售後服務。',
+    text: '比對購買記錄並啟用',
+    subtext: '售後服務',
     action: '訂單歸戶',
-    icon: 'DOC',
-    color: '#ff8a5c',
+    icon: '📄',
+    color: 'bg-[#ff8a5c]',
+    bg: 'bg-[#fff7ed]',
   },
   {
     title: 'AI 初始評估',
-    text: '建立基礎健康檔案，協助後續關懷與建議。',
+    text: '建立個人健康檔案',
+    subtext: '提供專屬保健建議',
     action: '開始評估',
-    icon: 'AI',
-    color: '#8b5cf6',
+    icon: '🤖',
+    color: 'bg-[#8b5cf6]',
+    bg: 'bg-[#f3f0ff]',
   },
 ];
 
@@ -220,7 +229,7 @@ export default function Home() {
               { label: '個人資料', href: '/profile' },
               { label: '管理後台', href: '/admin' },
             ].map((item) => {
-              const isActive = item.href === '/' ? true : false;
+              const isActive = item.href === '/';
               return (
                 <a
                   key={item.href}
@@ -238,8 +247,9 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="w-10 h-10 rounded-full bg-[#f8fbfa] border border-[#d9e7e5] flex items-center justify-center text-[#637082] hover:bg-[#dff4f0] transition">
+            <button className="w-10 h-10 rounded-full bg-[#f8fbfa] border border-[#d9e7e5] flex items-center justify-center text-[#637082] hover:bg-[#dff4f0] transition relative">
               <span className="text-lg">🔔</span>
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">2</span>
             </button>
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.href = '/profile'}>
               <div className="w-10 h-10 bg-[#008f7a] rounded-full flex items-center justify-center text-white font-semibold">
@@ -253,49 +263,49 @@ export default function Home() {
       </header>
 
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-8 md:px-8">
-
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#f7fbfa] via-white to-[#e8f8f3] border border-[#d9e7e5]">
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#dff4f0] to-transparent rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#e8f8f3] to-transparent rounded-full blur-2xl opacity-60 translate-y-1/2 -translate-x-1/2" />
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#f0faf8] via-white to-[#e8f8f3] border border-[#d9e7e5]">
+          {/* Decorative leaves */}
+          <div className="absolute top-10 right-20 w-16 h-16 opacity-20">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /><path d="M12 22c-3-5-8-8-8-8" /></svg>
+          </div>
+          <div className="absolute bottom-20 right-10 w-12 h-12 opacity-15 rotate-45">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /></svg>
+          </div>
+          <div className="absolute top-1/3 left-10 w-8 h-8 opacity-10 -rotate-12">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /></svg>
+          </div>
           
-          {/* Floating leaves decoration */}
-          <div className="absolute top-20 right-1/4 w-8 h-8 text-[#a8d5ba] opacity-60 rotate-45">🍃</div>
-          <div className="absolute bottom-32 right-16 w-6 h-6 text-[#a8d5ba] opacity-40 -rotate-12">🍃</div>
-          <div className="absolute top-40 right-12 w-10 h-10 text-[#a8d5ba] opacity-50 rotate-12">🍃</div>
-          
-          <div className="relative grid lg:grid-cols-3 gap-8 p-8 md:p-12">
-            {/* Left Content */}
-            <div className="lg:col-span-1 flex flex-col justify-center">
-              <p className="text-sm font-semibold text-[#008f7a] tracking-wider mb-2">CARE EVERYDAY, A BETTER TOMORROW</p>
+          <div className="relative grid lg:grid-cols-12 gap-6 p-8 md:p-12">
+            {/* Left Content - 4 cols */}
+            <div className="lg:col-span-4 flex flex-col justify-center">
+              <p className="text-sm font-semibold text-[#008f7a] tracking-wider mb-3">CARE EVERYDAY, A BETTER TOMORROW</p>
               <div className="relative">
                 <h1 className="text-4xl md:text-5xl font-bold text-[#063b59] mb-4 leading-tight">
                   你的售後健康服務<br />我們一直都在
                 </h1>
-                {/* Decorative heart */}
-                <svg className="absolute -right-8 top-1/2 w-16 h-16 text-[#a8d5ba] opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg className="absolute -right-4 top-8 w-12 h-12 text-[#a8d5ba]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </div>
-              <p className="text-lg text-[#637082] mb-8 leading-relaxed">
+              <p className="text-base text-[#637082] mb-8 leading-relaxed">
                 完成身份綁定與服務設定，這裡會整理由你你使用方式、<br />
                 每日計畫、健康追蹤與專屬關懷服務。
               </p>
-              <div className="flex gap-4 mb-8">
+              <div className="flex gap-4 mb-10">
                 <button
-                  className="px-8 py-4 bg-[#008f7a] text-white rounded-xl font-semibold text-lg hover:opacity-90 transition flex items-center gap-2 shadow-lg"
+                  className="px-8 py-4 bg-[#008f7a] text-white rounded-xl font-semibold text-base hover:opacity-90 transition flex items-center gap-2 shadow-lg"
                   onClick={handlePrimaryStart}
                 >
                   開始設定 <span>→</span>
                 </button>
-                <button className="px-8 py-4 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold text-lg hover:bg-[#dff4f0] transition flex items-center gap-2">
+                <button className="px-8 py-4 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold text-base hover:bg-[#dff4f0] transition flex items-center gap-2">
                   了解更多 <span className="w-5 h-5 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-xs">▶</span>
                 </button>
               </div>
               <div className="flex gap-8">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#e8f8f3] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
                     <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   </div>
                   <div className="text-center">
@@ -304,7 +314,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#e8f8f3] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
                     <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                   </div>
                   <div className="text-center">
@@ -313,7 +323,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#e8f8f3] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
                     <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                   </div>
                   <div className="text-center">
@@ -324,65 +334,73 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Middle - Product Image */}
-            <div className="lg:col-span-1 relative flex items-center justify-center">
-              {/* Marble platform */}
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-48 h-16 bg-gradient-to-b from-white to-[#e8f0ee] rounded-[50%] shadow-lg opacity-80" />
+            {/* Middle - Product Image - 5 cols */}
+            <div className="lg:col-span-5 relative flex flex-col items-center justify-center">
+              {/* Decorative text */}
+              <div className="absolute top-8 right-8 text-right">
+                <p className="text-lg text-[#7fb5a3] font-medium">小小的堅持</p>
+                <p className="text-lg text-[#7fb5a3] font-medium">成就健康的你 ♡</p>
+              </div>
               
-              {homepageImage ? (
-                <div className="relative z-10 flex flex-col items-center">
-                  <img src={homepageImage} alt="產品圖" className="max-h-80 object-contain rounded-2xl shadow-2xl relative z-10" />
-                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur rounded-full px-4 py-2 shadow-lg flex flex-wrap justify-center gap-3 z-20">
-                    <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 調節機能</span>
-                    <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 增強保護力</span>
-                    <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 每日健康守護</span>
+              {/* Marble platform */}
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-56 h-14 bg-gradient-to-b from-white to-[#e8f0ee] rounded-[50%] shadow-lg" />
+              
+              {/* Product image */}
+              <div className="relative z-10 mb-8">
+                {homepageImage ? (
+                  <img src={homepageImage} alt="產品圖" className="max-h-80 object-contain" />
+                ) : (
+                  <div className="w-48 h-64 bg-gradient-to-br from-white to-[#f0f7f5] rounded-2xl shadow-2xl flex flex-col items-center justify-center border border-[#d9e7e5]">
+                    <div className="w-16 h-16 bg-[#008f7a] rounded-full flex items-center justify-center mb-4">
+                      <span className="text-white font-bold text-xl">957</span>
+                    </div>
+                    <p className="text-lg font-bold text-[#063b59]">牛樟芝</p>
+                    <p className="text-sm text-[#637082]">菌絲體膠囊</p>
+                    <p className="text-xs text-[#637082] mt-2">Antrodia Cinnamomea</p>
                   </div>
-                </div>
-              ) : (
-                <div className="relative z-10 product-scene">
-                  <div className="marble-stand" />
-                  <div className="product-box">
-                    <span>957</span>
-                    <small>牛樟芝</small>
-                  </div>
-                  <div className="product-bottle">
-                    <div className="cap" />
-                    <span>957</span>
-                    <small>牛樟芝</small>
-                  </div>
-                  <i className="leaf leaf-one" />
-                  <i className="leaf leaf-two" />
-                </div>
-              )}
+                )}
+              </div>
+              
+              {/* Product benefits */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur rounded-full px-4 py-2 shadow-lg flex gap-4 z-20">
+                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 調節機能</span>
+                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 增強保護力</span>
+                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 每日健康守護</span>
+              </div>
+              
+              {/* Carousel dots */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#008f7a]" />
+                <span className="w-2 h-2 rounded-full bg-[#d9e7e5]" />
+                <span className="w-2 h-2 rounded-full bg-[#d9e7e5]" />
+              </div>
             </div>
 
-            {/* Right - Progress Card */}
-            <div className="lg:col-span-1 flex items-center">
+            {/* Right - Progress Card - 3 cols */}
+            <div className="lg:col-span-3 flex items-center">
               <div className="bg-white rounded-3xl border border-[#d9e7e5] p-6 w-full shadow-lg">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-[#e8f8f3] flex items-center justify-center">
                     <svg className="w-5 h-5 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   </div>
                   <span className="font-semibold text-[#063b59]">啟用進度</span>
                 </div>
                 <div className="flex items-center justify-center mb-4">
-                  <div className="relative w-32 h-32">
-                    <svg className="w-32 h-32 transform -rotate-90">
-                      <circle cx="64" cy="64" r="56" stroke="#e8f8f3" strokeWidth="12" fill="none" />
-                      <circle cx="64" cy="64" r="56" stroke="#008f7a" strokeWidth="12" fill="none" strokeDasharray={`${2 * Math.PI * 56}`} strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress / 100)}`} strokeLinecap="round" />
+                  <div className="relative w-40 h-40">
+                    <svg className="w-40 h-40 transform -rotate-90">
+                      <circle cx="80" cy="80" r="70" stroke="#e8f8f3" strokeWidth="14" fill="none" />
+                      <circle cx="80" cy="80" r="70" stroke="#008f7a" strokeWidth="14" fill="none" strokeDasharray={`${2 * Math.PI * 70}`} strokeDashoffset={`${2 * Math.PI * 70 * (1 - progress / 100)}`} strokeLinecap="round" />
                     </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-[#063b59]">{progress}%</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-4xl font-bold text-[#063b59]">{progress}%</span>
+                      <span className="text-sm text-[#637082]">{isActivated ? '已完成' : `已完成 ${effectiveCompleted}/4`}</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-center text-sm text-[#637082] mb-2">
-                  {isActivated ? '已完成' : `已完成 ${effectiveCompleted}/4 個步驟`}
-                </p>
-                <p className="text-center text-sm font-semibold text-[#063b59] mb-4">
+                <p className="text-center text-sm font-semibold text-[#063b59] mb-6">
                   {isActivated ? '太棒了！你的售後健康服務已準備就緒' : '完成步驟即可啟用服務'}
                 </p>
-                <button className="w-full py-3 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold hover:bg-[#dff4f0] transition">
+                <button className="w-full py-3 bg-[#008f7a] text-white rounded-xl font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
                   查看我的設定 →
                 </button>
               </div>
@@ -394,40 +412,34 @@ export default function Home() {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {onboardingSteps.map((step, index) => {
             const isStepCompleted = getStepStatus(index);
-            const iconStyles = [
-              { bg: 'bg-[#06c755]', icon: '💬', label: 'LINE' },
-              { bg: 'bg-[#3b82f6]', icon: '📱', label: 'TEL' },
-              { bg: 'bg-[#ff8a5c]', icon: '📄', label: 'DOC' },
-              { bg: 'bg-[#8b5cf6]', icon: '🤖', label: 'AI' },
-            ];
-            const style = iconStyles[index];
             return (
               <article 
-                className={`bg-white rounded-2xl border-2 p-6 cursor-pointer transition hover:shadow-lg ${
-                  isStepCompleted ? 'border-[#008f7a] bg-[#f0faf8]' : 'border-[#d9e7e5]'
+                className={`bg-white rounded-2xl border-2 p-5 cursor-pointer transition hover:shadow-lg relative ${
+                  isStepCompleted ? 'border-[#008f7a]' : 'border-[#d9e7e5]'
                 }`}
                 key={step.title}
                 onClick={() => handleStepClick(index)}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl ${style.bg} flex items-center justify-center`}>
-                      <span className="text-xl">{style.icon}</span>
-                    </div>
-                    <span className="text-lg font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</span>
-                  </div>
-                  {isStepCompleted && (
-                    <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
-                  )}
+                {/* Step number */}
+                <div className="absolute top-4 right-4 text-sm font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</div>
+                
+                {/* Icon */}
+                <div className={`w-14 h-14 rounded-2xl ${step.bg} flex items-center justify-center mb-4`}>
+                  <span className="text-2xl">{step.icon}</span>
                 </div>
+                
                 <h3 className="text-lg font-bold text-[#063b59] mb-2">{step.title}</h3>
-                <p className="text-sm text-[#637082] mb-4">{step.text}</p>
+                <p className="text-sm text-[#637082] mb-1">{step.text}</p>
+                <p className="text-sm text-[#637082] mb-4">{step.subtext}</p>
+                
                 <div className="flex items-center justify-between">
                   <span className={`text-sm font-semibold ${isStepCompleted ? 'text-[#008f7a]' : 'text-[#637082]'}`}>
                     {isStepCompleted ? '已完成' : '待完成'}
                   </span>
-                  {!isStepCompleted && (
-                    <span className="text-sm text-[#008f7a] font-semibold">{step.action} →</span>
+                  {isStepCompleted ? (
+                    <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
+                  ) : (
+                    <span className="text-[#637082]">›</span>
                   )}
                 </div>
               </article>
@@ -440,7 +452,7 @@ export default function Home() {
           {/* Product Card */}
           <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
             <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">我的商品</span>
+              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">推薦商品 | RECOMMENDED</span>
             </div>
             <div className="flex gap-6">
               <div className="w-32 h-32 flex-shrink-0">
@@ -453,20 +465,19 @@ export default function Home() {
                 )}
               </div>
               <div className="flex-1">
-                <span className="inline-block px-2 py-1 bg-[#e8f8f3] text-[#008f7a] rounded text-xs font-semibold mb-2">已完成啟用</span>
                 <h3 className="text-xl font-bold text-[#063b59] mb-2">{productData?.name || '957 牛樟芝精華膠囊'}</h3>
                 <p className="text-sm text-[#637082] mb-4">已為你整理由相關健康保健建議，完成帳戶後即可開始。</p>
                 <div className="flex gap-4 mb-4">
                   <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a]">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
                     日常保健
                   </div>
                   <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a]">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
                     調節機能
                   </div>
                   <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a]">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
                     增強保護力
                   </div>
                 </div>
@@ -498,17 +509,18 @@ export default function Home() {
               查看今日計畫 →
             </button>
             <div className="grid grid-cols-4 gap-3">
-              {timeline.map((item) => (
-                <div key={item} className="text-center">
+              {[
+                { icon: '⏰', title: '服用提醒', desc: '不錯過每日進度' },
+                { icon: '📊', title: '計畫追蹤', desc: '掌握每日狀況' },
+                { icon: '📝', title: '數據記錄', desc: '記錄健康數據' },
+                { icon: '👨‍⚕️', title: '專業關懷', desc: '顧問全程陪伴' },
+              ].map((item) => (
+                <div key={item.title} className="text-center">
                   <div className="w-12 h-12 mx-auto bg-[#e8f8f3] rounded-xl flex items-center justify-center mb-2">
-                    <span className="text-lg">⏰</span>
+                    <span className="text-xl">{item.icon}</span>
                   </div>
-                  <p className="text-xs font-semibold text-[#063b59]">{item}</p>
-                  <p className="text-xs text-[#637082] mt-1">
-                    {item === '服用提醒' ? '不錯過每日進度' : 
-                     item === '計畫追蹤' ? '掌握每日狀況' :
-                     item === '數據記錄' ? '記錄健康數據' : '顧問全程陪伴'}
-                  </p>
+                  <p className="text-xs font-semibold text-[#063b59]">{item.title}</p>
+                  <p className="text-xs text-[#637082] mt-1">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -539,7 +551,7 @@ export default function Home() {
               <div className="w-8 h-8 rounded-full bg-[#008f7a] flex items-center justify-center text-white font-bold text-sm">AI</div>
               <h3 className="text-lg font-bold text-[#063b59]">AI 智能問答</h3>
             </div>
-            <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
+            <div className="space-y-4 mb-4 max-h-48 overflow-y-auto">
               {chatMessages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
@@ -576,12 +588,15 @@ export default function Home() {
               <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">7 Day 健康追蹤</span>
             </div>
             <h3 className="text-xl font-bold text-[#063b59] mb-2">最近 7 天，<br />您的狀況如何？</h3>
-            <p className="text-sm text-[#637082] mb-6">持續回報有助於我們提供更精準的關懷與建議。</p>
+            <p className="text-sm text-[#637082] mb-4">持續回報有助於我們提供更精準的關懷與建議。</p>
             
             {/* Simple Chart */}
-            <div className="h-32 mb-6 flex items-end justify-between gap-1">
+            <div className="h-24 mb-4 flex items-end justify-between gap-1 px-2">
               {[40, 60, 45, 70, 55, 80, 65].map((height, idx) => (
-                <div key={idx} className="flex-1 bg-gradient-to-t from-[#008f7a] to-[#00a896] rounded-t-lg" style={{ height: `${height}%` }} />
+                <div key={idx} className="flex-1 flex flex-col items-center">
+                  <div className="w-full bg-gradient-to-t from-[#008f7a] to-[#00a896] rounded-t-lg" style={{ height: `${height}%` }} />
+                  <span className="text-xs text-[#637082] mt-1">{['一', '二', '三', '四', '五', '六', '日'][idx]}</span>
+                </div>
               ))}
             </div>
             
