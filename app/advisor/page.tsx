@@ -20,6 +20,32 @@ export default function AdvisorPage() {
     priority: 'normal',
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [carouselImages, setCarouselImages] = useState<string[]>([]);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // 載入輪播圖
+  useEffect(() => {
+    const saved = localStorage.getItem('carouselImages');
+    if (saved) {
+      try {
+        const imgs = JSON.parse(saved);
+        if (Array.isArray(imgs) && imgs.length > 0) {
+          setCarouselImages(imgs);
+        }
+      } catch (e) {
+        console.error('Failed to parse carousel images:', e);
+      }
+    }
+  }, []);
+
+  // 自動輪播
+  useEffect(() => {
+    if (carouselImages.length <= 1) return;
+    const timer = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [carouselImages.length]);
 
   // 加載用戶顧問案件
   useEffect(() => {
@@ -124,46 +150,53 @@ export default function AdvisorPage() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-[#dff4f0] rounded-full flex items-center justify-center">
-                <span className="text-2xl">📋</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#0f2240]">總案件數</h3>
-                <p className="text-3xl font-bold text-[#087e74]">2</p>
-              </div>
+        {/* 輪播圖 */}
+        {carouselImages.length > 0 ? (
+          <div className="relative mb-8 rounded-2xl overflow-hidden shadow-lg border border-[#d9e7e5] bg-white">
+            <div className="relative h-48 md:h-64">
+              {carouselImages.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`輪播圖 ${idx + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                    idx === carouselIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
             </div>
-            <p className="text-sm text-[#637082]">您的歷史諮詢記錄</p>
+            {carouselImages.length > 1 && (
+              <>
+                <button
+                  onClick={() => setCarouselIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#087e74] flex items-center justify-center shadow transition"
+                  aria-label="上一張"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => setCarouselIndex((prev) => (prev + 1) % carouselImages.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#087e74] flex items-center justify-center shadow transition"
+                  aria-label="下一張"
+                >
+                  ›
+                </button>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                  {carouselImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCarouselIndex(idx)}
+                      className={`w-2.5 h-2.5 rounded-full transition ${
+                        idx === carouselIndex ? 'bg-[#087e74]' : 'bg-white/70'
+                      }`}
+                      aria-label={`第 ${idx + 1} 張`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-[#dff4f0] rounded-full flex items-center justify-center">
-                <span className="text-2xl">⏳</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#0f2240]">處理中</h3>
-                <p className="text-3xl font-bold text-[#087e74]">1</p>
-              </div>
-            </div>
-            <p className="text-sm text-[#637082]">正在處理的案件</p>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-[#dff4f0] rounded-full flex items-center justify-center">
-                <span className="text-2xl">✅</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#0f2240]">已完成</h3>
-                <p className="text-3xl font-bold text-[#087e74]">1</p>
-              </div>
-            </div>
-            <p className="text-sm text-[#637082]">已解決的案件</p>
-          </div>
-        </div>
+        ) : null}
 
         <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] overflow-hidden">
           <div className="p-6 border-b border-[#d9e7e5]">

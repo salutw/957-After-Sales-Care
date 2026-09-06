@@ -169,6 +169,7 @@ export default function AdminPage() {
     subtitle: '完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。',
   });
   const [homepageImageFile, setHomepageImageFile] = useState<File | null>(null);
+  const [carouselImages, setCarouselImages] = useState<string[]>([]);
 
   // 從 localStorage 載入管理員帳號
   useEffect(() => {
@@ -181,6 +182,16 @@ export default function AdminPage() {
         title: savedHomepageTitle || '你的售後健康服務已準備好',
         subtitle: savedHomepageSubtitle || '完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。',
       });
+    }
+
+    const savedCarousel = localStorage.getItem('carouselImages');
+    if (savedCarousel) {
+      try {
+        const imgs = JSON.parse(savedCarousel);
+        if (Array.isArray(imgs)) setCarouselImages(imgs);
+      } catch (e) {
+        console.error('Failed to parse carousel images:', e);
+      }
     }
 
     const savedAdmins = localStorage.getItem('adminAccounts');
@@ -2148,6 +2159,60 @@ export default function AdminPage() {
                     <div className="mt-4">
                       <p className="text-sm font-semibold text-[#0f2240] mb-2">預覽：</p>
                       <img src={homepageSettings.productImage} alt="產品圖預覽" className="max-h-48 rounded-lg border border-[#d9e7e5]" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 輪播圖管理 */}
+              <div className="bg-[#f8fbfa] rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-[#0f2240] mb-4">輪播圖管理</h3>
+                <p className="text-sm text-[#637082] mb-4">這些圖片會顯示在顧問諮詢等前台頁面的輪播區塊。</p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">新增輪播圖</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files && files.length > 0) {
+                          const readers: Promise<string>[] = Array.from(files).map((file) =>
+                            new Promise((resolve) => {
+                              const reader = new FileReader();
+                              reader.onload = () => resolve(reader.result as string);
+                              reader.readAsDataURL(file);
+                            })
+                          );
+                          Promise.all(readers).then((results) => {
+                            const updated = [...carouselImages, ...results];
+                            setCarouselImages(updated);
+                            localStorage.setItem('carouselImages', JSON.stringify(updated));
+                          });
+                        }
+                        e.target.value = '';
+                      }}
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                  </div>
+                  {carouselImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {carouselImages.map((img, idx) => (
+                        <div key={idx} className="relative group">
+                          <img src={img} alt={`輪播圖 ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border border-[#d9e7e5]" />
+                          <button
+                            onClick={() => {
+                              const updated = carouselImages.filter((_, i) => i !== idx);
+                              setCarouselImages(updated);
+                              localStorage.setItem('carouselImages', JSON.stringify(updated));
+                            }}
+                            className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
