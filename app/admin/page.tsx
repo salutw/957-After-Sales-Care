@@ -23,7 +23,10 @@ export default function AdminPage() {
         name: admin.name,
         department: admin.department,
         role: admin.role,
-        permissions: admin.permissions,
+        permissions: {
+          ...admin.permissions,
+          homepage: true,
+        },
       });
     } catch (error) {
       console.error('Failed to parse admin info:', error);
