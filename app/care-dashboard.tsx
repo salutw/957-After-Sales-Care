@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import MainNav from './components/MainNav';
@@ -47,19 +47,25 @@ const assistantExamples = ['一般食用方式', '進階使用方式', '建議�
 const assistantAnswer =
   '可以的。關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式，例如建議服用時段、每日建議量與注意事項；若你想了解進階使用，會再參考會員訂單、使用天數、近期健康回報與生活作息，整理更貼近你的使用建議。若問題涉及搭配商品，正式版會由後台商品資料與 AI 分析規則比對你的需求，提供可參考的搭配方向。';
 
-function ProductScene({ compact = false }: { compact?: boolean }) {
+function ProductScene({ compact = false, imageUrl }: { compact?: boolean; imageUrl?: string }) {
   return (
     <div className={compact ? 'product-scene compact' : 'product-scene'}>
       <div className="marble-stand" />
-      <div className="product-box">
-        <span>957</span>
-        <small>牛樟芝</small>
-      </div>
-      <div className="product-bottle">
-        <div className="cap" />
-        <span>957</span>
-        <small>牛樟芝</small>
-      </div>
+      {imageUrl ? (
+        <img src={imageUrl} alt="產品圖" className="product-image" />
+      ) : (
+        <>
+          <div className="product-box">
+            <span>957</span>
+            <small>牛樟芝</small>
+          </div>
+          <div className="product-bottle">
+            <div className="cap" />
+            <span>957</span>
+            <small>牛樟芝</small>
+          </div>
+        </>
+      )}
       <i className="leaf leaf-one" />
       <i className="leaf leaf-two" />
     </div>
@@ -78,6 +84,18 @@ export default function Home() {
   const [panel, setPanel] = useState<'none' | 'intake' | 'health' | 'advisor'>('none');
   const [assistantQuery, setAssistantQuery] = useState('我想了解 957 牛樟芝怎麼使用？');
   const [showUsageModal, setShowUsageModal] = useState(false);
+  const [homepageImage, setHomepageImage] = useState('');
+  const [homepageTitle, setHomepageTitle] = useState('你的售後健康服務已準備好');
+  const [homepageSubtitle, setHomepageSubtitle] = useState('完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。');
+
+  useEffect(() => {
+    const savedImage = localStorage.getItem('homepageProductImage');
+    const savedTitle = localStorage.getItem('homepageTitle');
+    const savedSubtitle = localStorage.getItem('homepageSubtitle');
+    if (savedImage) setHomepageImage(savedImage);
+    if (savedTitle) setHomepageTitle(savedTitle);
+    if (savedSubtitle) setHomepageSubtitle(savedSubtitle);
+  }, []);
   
   // 計算完成進度，根據各個步驟的完成狀態
   const effectiveCompleted = useMemo(() => {
@@ -182,13 +200,11 @@ export default function Home() {
 
         <section className="hero-shell">
           <div className="hero-plant plant-left" />
-          <ProductScene />
+          <ProductScene imageUrl={homepageImage} />
           <div className="hero-copy">
             <p className="eyebrow">957 After-Sales Care</p>
-            <h1>你的售後健康服務已準備好</h1>
-            <p>
-              完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。
-            </p>
+            <h1>{homepageTitle}</h1>
+            <p>{homepageSubtitle}</p>
             <div className="hero-actions">
               <button
                 className="primary-button"
@@ -263,7 +279,7 @@ export default function Home() {
             <section className="dashboard-grid">
               <article className="product-card">
                 <div className="section-pill">我的商品</div>
-                <ProductScene compact />
+                <ProductScene compact imageUrl={homepageImage} />
                 <div className="product-copy">
                   <span className="status-badge">已完成啟用</span>
                   <h2>957 牛樟芝精華膠囊</h2>

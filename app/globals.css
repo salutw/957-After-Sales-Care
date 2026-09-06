@@ -1850,3 +1850,21 @@ footer {
     border-radius: 3px;
   }
 }
+
+.product-scene .product-image {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  max-height: 75%;
+  max-width: 75%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.product-scene.compact .product-image {
+  left: 50%;
+  bottom: 20px;
+  max-height: 85%;
+  max-width: 85%;
+}

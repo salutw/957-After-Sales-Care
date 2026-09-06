@@ -152,15 +152,33 @@ export default function AdminPage() {
       products: true,
       api: true,
       admins: true,
+      homepage: true,
     },
   });
   const [adminAccounts, setAdminAccounts] = useState([]);
   const [showEditAdminModal, setShowEditAdminModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [homepageSettings, setHomepageSettings] = useState({
+    productImage: '',
+    title: '你的售後健康服務已準備好',
+    subtitle: '完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。',
+  });
+  const [homepageImageFile, setHomepageImageFile] = useState<File | null>(null);
 
   // 從 localStorage 載入管理員帳號
   useEffect(() => {
+    const savedHomepage = localStorage.getItem('homepageProductImage');
+    const savedHomepageTitle = localStorage.getItem('homepageTitle');
+    const savedHomepageSubtitle = localStorage.getItem('homepageSubtitle');
+    if (savedHomepage || savedHomepageTitle || savedHomepageSubtitle) {
+      setHomepageSettings({
+        productImage: savedHomepage || '',
+        title: savedHomepageTitle || '你的售後健康服務已準備好',
+        subtitle: savedHomepageSubtitle || '完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。',
+      });
+    }
+
     const savedAdmins = localStorage.getItem('adminAccounts');
     if (savedAdmins) {
       try {
@@ -186,6 +204,7 @@ export default function AdminPage() {
           products: true,
           api: true,
           admins: true,
+          homepage: true,
         },
         status: 'active',
         createdAt: new Date().toISOString(),
@@ -719,6 +738,7 @@ export default function AdminPage() {
             { id: 'health', label: '健康數據', icon: '💊' },
             { id: 'products', label: '商品管理', icon: '🏪' },
             { id: 'api', label: 'API設定', icon: '⚙️' },
+            { id: 'homepage', label: '首頁設定', icon: '🏠' },
             { id: 'admins', label: '管理員管理', icon: '👤' },
           ]
           .filter(item => adminInfo.permissions[item.id])
@@ -2053,6 +2073,107 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+        {activeTab === 'homepage' && (
+          <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-6">
+            <h2 className="text-xl font-bold text-[#0f2240] mb-6">首頁設定</h2>
+            <div className="space-y-6">
+              <div className="bg-[#f8fbfa] rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-[#0f2240] mb-4">產品圖片</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">上傳圖片</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setHomepageSettings({ ...homepageSettings, productImage: reader.result as string });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">或輸入圖片 URL</label>
+                    <input
+                      type="text"
+                      value={homepageSettings.productImage}
+                      onChange={(e) => setHomepageSettings({ ...homepageSettings, productImage: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                  </div>
+                  {homepageSettings.productImage && (
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold text-[#0f2240] mb-2">預覽：</p>
+                      <img src={homepageSettings.productImage} alt="產品圖預覽" className="max-h-48 rounded-lg border border-[#d9e7e5]" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-[#f8fbfa] rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-[#0f2240] mb-4">首頁文案</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">標題</label>
+                    <input
+                      type="text"
+                      value={homepageSettings.title}
+                      onChange={(e) => setHomepageSettings({ ...homepageSettings, title: e.target.value })}
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">副標題</label>
+                    <textarea
+                      value={homepageSettings.subtitle}
+                      onChange={(e) => setHomepageSettings({ ...homepageSettings, subtitle: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {
+                    localStorage.setItem('homepageProductImage', homepageSettings.productImage);
+                    localStorage.setItem('homepageTitle', homepageSettings.title);
+                    localStorage.setItem('homepageSubtitle', homepageSettings.subtitle);
+                    alert('首頁設定已儲存');
+                  }}
+                  className="px-6 py-3 bg-[#087e74] text-white rounded-lg font-semibold hover:opacity-90 transition"
+                >
+                  儲存首頁設定
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('homepageProductImage');
+                    localStorage.removeItem('homepageTitle');
+                    localStorage.removeItem('homepageSubtitle');
+                    setHomepageSettings({
+                      productImage: '',
+                      title: '你的售後健康服務已準備好',
+                      subtitle: '完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。',
+                    });
+                    alert('已重設首頁設定');
+                  }}
+                  className="px-6 py-3 border border-[#d9e7e5] text-[#0f2240] rounded-lg font-semibold hover:bg-gray-50 transition"
+                >
+                  重設
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'api' && (
           <div className="bg-white rounded-2xl shadow-lg border border-[#d9e7e5] p-6">
