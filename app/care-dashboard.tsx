@@ -48,24 +48,26 @@ const assistantAnswer =
   '可以的。關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式，例如建議服用時段、每日建議量與注意事項；若你想了解進階使用，會再參考會員訂單、使用天數、近期健康回報與生活作息，整理更貼近你的使用建議。若問題涉及搭配商品，正式版會由後台商品資料與 AI 分析規則比對你的需求，提供可參考的搭配方向。';
 
 function ProductScene({ compact = false, imageUrl }: { compact?: boolean; imageUrl?: string }) {
+  if (imageUrl) {
+    return (
+      <div className={compact ? 'product-image-container compact' : 'product-image-container'}>
+        <img src={imageUrl} alt="產品圖" className="uploaded-product-image" />
+        <div className="image-glow" />
+      </div>
+    );
+  }
   return (
     <div className={compact ? 'product-scene compact' : 'product-scene'}>
       <div className="marble-stand" />
-      {imageUrl ? (
-        <img src={imageUrl} alt="產品圖" className="product-image" />
-      ) : (
-        <>
-          <div className="product-box">
-            <span>957</span>
-            <small>牛樟芝</small>
-          </div>
-          <div className="product-bottle">
-            <div className="cap" />
-            <span>957</span>
-            <small>牛樟芝</small>
-          </div>
-        </>
-      )}
+      <div className="product-box">
+        <span>957</span>
+        <small>牛樟芝</small>
+      </div>
+      <div className="product-bottle">
+        <div className="cap" />
+        <span>957</span>
+        <small>牛樟芝</small>
+      </div>
       <i className="leaf leaf-one" />
       <i className="leaf leaf-two" />
     </div>
