@@ -128,6 +128,7 @@ export default function AdminPage() {
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
+    image: '',
     suggestedTime: '',
     dosage: '',
     interval: '',
@@ -429,6 +430,7 @@ export default function AdminPage() {
     setProductForm({
       name: product.name,
       description: product.description,
+      image: product.image || '',
       suggestedTime: product.usage.suggestedTime,
       dosage: product.usage.dosage,
       interval: product.usage.interval,
@@ -446,7 +448,16 @@ export default function AdminPage() {
     setProductForm({
       name: '',
       description: '',
+      image: '',
       suggestedTime: '',
+      dosage: '',
+      interval: '',
+      dailyMax: '',
+      storageLocation: '',
+      storageTemperature: '',
+      storageHumidity: '',
+      warnings: '',
+    });
       dosage: '',
       interval: '',
       dailyMax: '',
@@ -467,6 +478,7 @@ export default function AdminPage() {
               ...prod,
               name: productForm.name,
               description: productForm.description,
+              image: productForm.image,
               usage: {
                 suggestedTime: productForm.suggestedTime,
                 dosage: productForm.dosage,
@@ -1274,8 +1286,12 @@ export default function AdminPage() {
               {products.map((product) => (
                 <div key={product.id} className="flex items-center justify-between p-4 bg-[#f8fbfa] rounded-lg">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-[#dff4f0] rounded-lg flex items-center justify-center">
-                      <span className="text-2xl">📦</span>
+                    <div className="w-16 h-16 bg-[#dff4f0] rounded-lg flex items-center justify-center overflow-hidden">
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">📦</span>
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-[#0f2240]">{product.name}</h3>
@@ -1338,6 +1354,30 @@ export default function AdminPage() {
                         className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
                       />
                     </div>
+                  </div>
+                  <div className="mt-4">
+                    <label className="block text-sm font-semibold text-[#0f2240] mb-2">商品圖片</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setProductForm({ ...productForm, image: reader.result as string });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full px-4 py-3 border border-[#d9e7e5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#087e74]"
+                    />
+                    {productForm.image && (
+                      <div className="mt-4">
+                        <p className="text-sm font-semibold text-[#0f2240] mb-2">預覽：</p>
+                        <img src={productForm.image} alt="商品圖預覽" className="max-h-48 rounded-lg border border-[#d9e7e5]" />
+                      </div>
+                    )}
                   </div>
                 </div>
 

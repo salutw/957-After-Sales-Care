@@ -85,6 +85,7 @@ export default function Home() {
   const [assistantQuery, setAssistantQuery] = useState('我想了解 957 牛樟芝怎麼使用？');
   const [showUsageModal, setShowUsageModal] = useState(false);
   const [homepageImage, setHomepageImage] = useState('');
+  const [productImage, setProductImage] = useState('');
   const [homepageTitle, setHomepageTitle] = useState('你的售後健康服務已準備好');
   const [homepageSubtitle, setHomepageSubtitle] = useState('完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。');
 
@@ -95,6 +96,18 @@ export default function Home() {
     if (savedImage) setHomepageImage(savedImage);
     if (savedTitle) setHomepageTitle(savedTitle);
     if (savedSubtitle) setHomepageSubtitle(savedSubtitle);
+
+    const savedProducts = localStorage.getItem('products');
+    if (savedProducts) {
+      try {
+        const products = JSON.parse(savedProducts);
+        if (products.length > 0 && products[0].image) {
+          setProductImage(products[0].image);
+        }
+      } catch (error) {
+        console.error('Failed to parse products:', error);
+      }
+    }
   }, []);
   
   // 計算完成進度，根據各個步驟的完成狀態
@@ -279,7 +292,7 @@ export default function Home() {
             <section className="dashboard-grid">
               <article className="product-card">
                 <div className="section-pill">我的商品</div>
-                <ProductScene compact imageUrl={homepageImage} />
+                <ProductScene compact imageUrl={productImage} />
                 <div className="product-copy">
                   <span className="status-badge">已完成啟用</span>
                   <h2>957 牛樟芝精華膠囊</h2>
