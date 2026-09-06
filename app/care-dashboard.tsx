@@ -1,725 +1,497 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import MainNav from './components/MainNav';
+import { useAuth } from '@/contexts/AuthContext';
 
-const onboardingSteps = [
-  {
-    title: '綁定 LINE',
-    text: '接收專屬訊息、提醒與追蹤',
-    subtext: '現況追蹤綁定',
-    action: '開始綁定',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-        <text x="12" y="16" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">LINE</text>
-      </svg>
-    ),
-    color: 'bg-[#06c755]',
-    bg: 'bg-[#e7f9f0]',
-  },
-  {
-    title: '手機驗證',
-    text: '驗證購買人身份',
-    subtext: '保護會員權益',
-    action: '手機驗證',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="7" y="2" width="10" height="20" rx="2" />
-        <line x1="11" y1="18" x2="13" y2="18" />
-      </svg>
-    ),
-    color: 'bg-[#3b82f6]',
-    bg: 'bg-[#eff6ff]',
-  },
-  {
-    title: '訂單歸戶',
-    text: '比對購買記錄並啟用',
-    subtext: '售後服務',
-    action: '訂單歸戶',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
-    ),
-    color: 'bg-[#ff8a5c]',
-    bg: 'bg-[#fff7ed]',
-  },
-  {
-    title: 'AI 初始評估',
-    text: '建立個人健康檔案',
-    subtext: '提供專屬保健建議',
-    action: '開始評估',
-    icon: (
-      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="4" y="4" width="16" height="16" rx="4" />
-        <circle cx="9" cy="10" r="1.5" />
-        <circle cx="15" cy="10" r="1.5" />
-        <path d="M9 15c.85.63 1.885 1 3 1s2.15-.37 3-1" />
-        <path d="M8 4v-2M16 4v-2" />
-      </svg>
-    ),
-    color: 'bg-[#8b5cf6]',
-    bg: 'bg-[#f3f0ff]',
-  },
+type Panel = 'none' | 'intake' | 'health' | 'advisor';
+type ChatMessage = { role: 'user' | 'ai'; text: string };
+
+type ProductData = {
+  name?: string;
+  image?: string;
+  usage?: {
+    suggestedTime?: string;
+    dosage?: string;
+    interval?: string;
+    dailyMax?: string;
+  };
+  storage?: {
+    location?: string;
+    temperature?: string;
+    humidity?: string;
+  };
+  warnings?: string[];
+};
+
+const navItems = [
+  { label: '首頁', href: '/', icon: 'home' },
+  { label: '訂單管理', href: '/orders', icon: 'clipboard' },
+  { label: '健康記錄', href: '/health', icon: 'pulse' },
+  { label: '顧問諮詢', href: '/advisor', icon: 'chat' },
+  { label: '個人資料', href: '/profile', icon: 'user' },
+  { label: '管理後台', href: '/admin', icon: 'grid' },
 ];
 
-const timeline = ['服用提醒', '計畫追蹤', '數據記錄', '專業關懷'];
-const aiQuestions = [
-  '最近 7 天是否都有依建議服用？',
-  '睡眠、精神或腸胃狀況有明顯變化嗎？',
-  '是否出現任何不適，或希望顧問優先協助的問題？',
-];
 const intakeQuestions = [
   '目前主要保養目標是什麼？',
   '最近睡眠、精神與日常作息狀況如何？',
   '是否有固定用藥、特殊疾病或希望顧問留意的狀況？',
 ];
-const assistantExamples = ['一般食用方式', '進階使用方式', '建議搭配商品'];
-const assistantAnswer =
-  '可以的。關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式，例如建議服用時段、每日建議量與注意事項；若你想了解進階使用，會再參考會員訂單、使用天數、近期健康回報與生活作息，整理更貼近你的使用建議。若問題涉及搭配商品，正式版會由後台商品資料與 AI 分析規則比對你的需求，提供可參考的搭配方向。';
 
-function ProductScene({ compact = false, imageUrl }: { compact?: boolean; imageUrl?: string }) {
+const aiQuestions = [
+  '最近 7 天是否都有依建議使用？',
+  '睡眠、精神或腸胃狀況有明顯變化嗎？',
+  '是否出現任何不適，或希望顧問優先協助的問題？',
+];
+
+const assistantAnswer =
+  '可以的。關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式，例如建議使用時段、每日建議量與注意事項。進階使用會參考會員訂單、使用天數、近期健康回報與生活作息，整理成個人化參考建議；若涉及搭配商品，正式版會由後台商品資料與 AI 分析規則比對你的需求後回覆。';
+
+const dashboardTools = [
+  { icon: 'pill', title: '服用提醒', desc: '不漏掉每日目標' },
+  { icon: 'chart', title: '計畫追蹤', desc: '掌握每日狀況' },
+  { icon: 'doc', title: '數據記錄', desc: '累積健康資料' },
+  { icon: 'heart', title: '專業關懷', desc: '顧問全程陪伴' },
+];
+
+function Icon({ name, className = '' }: { name: string; className?: string }) {
+  const base = `dashboard-icon ${className}`.trim();
+
+  switch (name) {
+    case 'home':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 10 9-7 9 7" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>;
+    case 'clipboard':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 3h6l1 2h3v16H5V5h3l1-2Z" /><path d="M9 10h6M9 14h6M9 18h4" /></svg>;
+    case 'pulse':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>;
+    case 'chat':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 5h16v11H8l-4 4V5Z" /><path d="M8 9h8M8 13h5" /></svg>;
+    case 'user':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>;
+    case 'grid':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>;
+    case 'bell':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>;
+    case 'line':
+      return <svg className={base} viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.72 2 11.3c0 4.1 3.58 7.54 8.42 8.2.32.07.76.22.87.5.1.25.07.64.03.9l-.14.86c-.04.25-.2.98.86.53 1.06-.44 5.7-3.36 7.78-5.76A7.38 7.38 0 0 0 22 11.3C22 6.72 17.52 3 12 3Z" fill="currentColor" /><path d="M7 9.3v4h2.5M11 9.3v4M13 13.3v-4l3 4v-4M18 9.3h-2.2v4H18M15.8 11.3h1.8" stroke="white" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+    case 'phone':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="7" y="2" width="10" height="20" rx="2.5" /><path d="M11 18h2" /></svg>;
+    case 'doc':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 3h8l4 4v14H6V3Z" /><path d="M14 3v5h5M9 13h6M9 17h5" /></svg>;
+    case 'ai':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="7" width="14" height="11" rx="4" /><path d="M12 7V4M8 4h8" /><circle cx="10" cy="12" r="1" fill="currentColor" /><circle cx="14" cy="12" r="1" fill="currentColor" /><path d="M10 16h4" /></svg>;
+    case 'shield':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3 5 6v5c0 4.7 2.8 8.9 7 10 4.2-1.1 7-5.3 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></svg>;
+    case 'leaf':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 4C12 4 6 9 5 20c7-1 13-7 15-16Z" /><path d="M5 20c4-6 8-9 15-16" /></svg>;
+    case 'heart':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.8 5.8a5.5 5.5 0 0 0-7.8 0L12 6.8l-1-1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.4a5.5 5.5 0 0 0 0-7.8Z" /></svg>;
+    case 'pill':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.5 20.5 20.5 10.5a5 5 0 1 0-7-7l-10 10a5 5 0 1 0 7 7Z" /><path d="m8 16 8-8" /></svg>;
+    case 'chart':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19V5" /><path d="M8 17v-5M13 17V8M18 17v-8" /><path d="M4 19h17" /></svg>;
+    case 'send':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m22 2-7 20-4-9-9-4 20-7Z" /><path d="M22 2 11 13" /></svg>;
+    case 'headset':
+      return <svg className={base} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 13a8 8 0 0 1 16 0" /><path d="M4 13v4a2 2 0 0 0 2 2h2v-8H6a2 2 0 0 0-2 2ZM20 13v4a2 2 0 0 1-2 2h-2v-8h2a2 2 0 0 1 2 2Z" /><path d="M14 21h-3" /></svg>;
+    default:
+      return null;
+  }
+}
+
+function BrandMark() {
+  return <div className="site-brand-mark" aria-hidden="true"><span /></div>;
+}
+
+function ProductVisual({ imageUrl, compact = false }: { imageUrl?: string; compact?: boolean }) {
   if (imageUrl) {
     return (
-      <div className={compact ? 'product-image-container compact' : 'product-image-container'}>
-        <img src={imageUrl} alt="產品圖" className="uploaded-product-image" />
-        <div className="image-glow" />
+      <div className={compact ? 'product-display compact' : 'product-display'}>
+        <img src={imageUrl} alt="957 牛樟芝產品" />
       </div>
     );
   }
+
   return (
-    <div className={compact ? 'product-scene compact' : 'product-scene'}>
-      <div className="marble-stand" />
-      <div className="product-box">
-        <span>957</span>
-        <small>牛樟芝</small>
+    <div className={compact ? 'product-display compact' : 'product-display'} aria-label="957 牛樟芝產品示意">
+      <div className="product-pack pack-one">
+        <div className="pack-logo">957</div>
+        <strong>牛樟芝</strong>
+        <small>菌絲體膠囊</small>
       </div>
-      <div className="product-bottle">
-        <div className="cap" />
-        <span>957</span>
-        <small>牛樟芝</small>
+      <div className="product-pack pack-two">
+        <div className="pack-logo small">957</div>
+        <strong>健康守護</strong>
+        <small>30 caps</small>
       </div>
-      <i className="leaf leaf-one" />
-      <i className="leaf leaf-two" />
+      <div className="capsule-piece" />
     </div>
   );
 }
 
-function PillIcon({ label }: { label: string }) {
-  return <span className="pill-icon">{label}</span>;
+function ProgressRing({ progress }: { progress: number }) {
+  const safeProgress = Math.max(0, Math.min(100, progress));
+  const circumference = 2 * Math.PI * 48;
+  const offset = circumference - (safeProgress / 100) * circumference;
+
+  return (
+    <div className="progress-ring" aria-label={`啟用進度 ${safeProgress}%`}>
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="48" className="ring-bg" />
+        <circle cx="60" cy="60" r="48" className="ring-value" strokeDasharray={circumference} strokeDashoffset={offset} />
+      </svg>
+      <div>
+        <strong>{safeProgress}%</strong>
+        <span>{safeProgress === 100 ? '已完成' : `已完成 ${safeProgress / 25}/4`}</span>
+      </div>
+    </div>
+  );
 }
 
-export default function Home() {
+export default function CareDashboard() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, isPhoneVerified, isLineBound, isOrderLinked, isAiAssessed, setAiAssessed } = useAuth();
-  
-  const [completed, setCompleted] = useState(0);
-  const [panel, setPanel] = useState<'none' | 'intake' | 'health' | 'advisor'>('none');
-  const [assistantQuery, setAssistantQuery] = useState('我想了解 957 牛樟芝怎麼使用？');
-  const [showUsageModal, setShowUsageModal] = useState(false);
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    isPhoneVerified,
+    isLineBound,
+    isOrderLinked,
+    isAiAssessed,
+    setAiAssessed,
+  } = useAuth();
+
+  const [panel, setPanel] = useState<Panel>('none');
   const [homepageImage, setHomepageImage] = useState('');
   const [productImage, setProductImage] = useState('');
-  const [productData, setProductData] = useState<any>(null);
-  const [homepageTitle, setHomepageTitle] = useState('你的售後健康服務已準備好');
-  const [homepageSubtitle, setHomepageSubtitle] = useState('完成身份與訂單確認後，這裡會整理商品使用方式、每日計畫、健康追蹤與顧問服務。');
-  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
-    { role: 'user', text: '我想了解 957 牛樟芝怎麼使用？' },
-    { role: 'ai', text: '可以的，關於 957 牛樟芝，AI 小助理會先依商品資料庫提供一般食用方式、進階使用方式與建議搭配商品。' },
-  ]);
+  const [productData, setProductData] = useState<ProductData | null>(null);
+  const [showUsageModal, setShowUsageModal] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { role: 'user', text: '我想了解 957 牛樟芝怎麼使用？' },
+    { role: 'ai', text: assistantAnswer },
+  ]);
 
   useEffect(() => {
-    const savedImage = localStorage.getItem('homepageProductImage');
-    const savedTitle = localStorage.getItem('homepageTitle');
-    const savedSubtitle = localStorage.getItem('homepageSubtitle');
-    if (savedImage) setHomepageImage(savedImage);
-    if (savedTitle) setHomepageTitle(savedTitle);
-    if (savedSubtitle) setHomepageSubtitle(savedSubtitle);
+    const loadHomepageContent = () => {
+      const savedImage = localStorage.getItem('homepageProductImage');
+      if (savedImage) setHomepageImage(savedImage);
 
-    const savedProducts = localStorage.getItem('products');
-    if (savedProducts) {
+      const savedProducts = localStorage.getItem('products');
+      if (!savedProducts) return;
+
       try {
-        const products = JSON.parse(savedProducts);
+        const products = JSON.parse(savedProducts) as ProductData[];
         if (products.length > 0) {
           setProductData(products[0]);
-          if (products[0].image) {
-            setProductImage(products[0].image);
-          }
+          if (products[0].image) setProductImage(products[0].image);
         }
       } catch (error) {
         console.error('Failed to parse products:', error);
       }
-    }
+    };
+
+    loadHomepageContent();
   }, []);
-  
-  // 計算完成進度，根據各個步驟的完成狀態
-  const effectiveCompleted = useMemo(() => {
-    let count = 0;
-    if (isPhoneVerified) count++;
-    if (isLineBound) count++;
-    if (isOrderLinked) count++;
-    if (isAiAssessed) count++;
-    return count;
-  }, [isPhoneVerified, isLineBound, isOrderLinked, isAiAssessed]);
-  
-  const progress = useMemo(() => effectiveCompleted * 25, [effectiveCompleted]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  const stepStates = useMemo(
+    () => [
+      {
+        title: '綁定 LINE',
+        text: '接收專屬訊息、提醒與追蹤狀態綁定',
+        status: isLineBound,
+        icon: 'line',
+        tone: 'line',
+        action: () => {
+          if (!isLineBound) window.location.href = '/profile?showLineBinding=true';
+        },
+      },
+      {
+        title: '手機驗證',
+        text: '驗證購買人身份，保護會員權益',
+        status: isPhoneVerified,
+        icon: 'phone',
+        tone: 'phone',
+        action: () => {
+          if (!isPhoneVerified) window.location.href = '/auth/login';
+        },
+      },
+      {
+        title: '訂單歸戶',
+        text: '比對購買記錄並啟用售後服務',
+        status: isOrderLinked,
+        icon: 'doc',
+        tone: 'order',
+        action: () => {
+          if (!isOrderLinked) window.location.href = '/orders?showAddModal=true';
+        },
+      },
+      {
+        title: 'AI 初始評估',
+        text: '建立個人健康檔案，提供專屬保健建議',
+        status: isAiAssessed,
+        icon: 'ai',
+        tone: 'ai',
+        action: () => {
+          if (!isAiAssessed) setPanel('intake');
+        },
+      },
+    ],
+    [isAiAssessed, isLineBound, isOrderLinked, isPhoneVerified],
+  );
+
+  const effectiveCompleted = stepStates.filter((step) => step.status).length;
+  const progress = effectiveCompleted * 25;
   const isActivated = effectiveCompleted >= 4;
-
-  // 如果用戶未認證，重定向到登入頁面
-  if (!isLoading && !isAuthenticated) {
-    router.push('/auth/login');
-    return null;
-  }
-
-  const handlePrimaryStart = () => {
-    window.location.href = '/profile';
-  };
-
-  const handleStepClick = (index: number) => {
-    if (index === 0) {
-      if (isLineBound) return;
-      window.location.href = '/profile?showLineBinding=true';
-      return;
-    }
-    if (index === 1) {
-      if (isPhoneVerified) return;
-      window.location.href = '/auth/login';
-      return;
-    }
-    if (index === 2) {
-      if (isOrderLinked) return;
-      window.location.href = '/orders?showAddModal=true';
-      return;
-    }
-    if (index === 3) {
-      if (isAiAssessed) return;
-      setCompleted((value) => Math.max(value, 4));
-      setPanel('intake');
-      return;
-    }
-    setCompleted((value) => Math.max(value, index + 1));
-  };
-
-  const handleShowUsage = () => {
-    setShowUsageModal(true);
-  };
 
   const handleSendMessage = () => {
     if (!chatInput.trim()) return;
-    setChatMessages([...chatMessages, { role: 'user', text: chatInput }]);
+    setChatMessages((messages) => [...messages, { role: 'user', text: chatInput.trim() }]);
     setChatInput('');
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { role: 'ai', text: assistantAnswer }]);
-    }, 500);
+    window.setTimeout(() => {
+      setChatMessages((messages) => [...messages, { role: 'ai', text: assistantAnswer }]);
+    }, 450);
   };
 
-  const getStepStatus = (index: number) => {
-    switch (index) {
-      case 0: return isLineBound;
-      case 1: return isPhoneVerified;
-      case 2: return isOrderLinked;
-      case 3: return isAiAssessed;
-      default: return false;
-    }
-  };
+  if (isLoading || !isAuthenticated) return null;
 
   return (
-    <main className="min-h-screen bg-[#f7fbfa] text-[#0f2240]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#d9e7e5] sticky top-0 z-50">
-        <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-5 md:px-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#008f7a] rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">957</span>
-            </div>
-            <div>
-              <strong className="text-xl font-bold text-[#063b59]">957 After-Sales Care</strong>
-              <p className="text-xs text-[#637082]">用關心，陪你更健康</p>
-            </div>
+    <main className="care-home">
+      <header className="care-header">
+        <div className="header-brand" onClick={() => router.push('/')}>
+          <BrandMark />
+          <div>
+            <strong>957 After-Sales Care</strong>
+            <span>用關心，陪你更健康</span>
           </div>
+        </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            {[
-              { label: '首頁', href: '/' },
-              { label: '訂單管理', href: '/orders' },
-              { label: '健康記錄', href: '/health' },
-              { label: '顧問諮詢', href: '/advisor' },
-              { label: '個人資料', href: '/profile' },
-              { label: '管理後台', href: '/admin' },
-            ].map((item) => {
-              const isActive = item.href === '/';
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`text-sm font-semibold transition ${
-                    isActive
-                      ? 'text-[#008f7a]'
-                      : 'text-[#637082] hover:text-[#008f7a]'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
-          </nav>
+        <nav className="care-nav" aria-label="主要導覽">
+          {navItems.map((item) => (
+            <a className={item.href === '/' ? 'active' : ''} href={item.href} key={item.href}>
+              <Icon name={item.icon} />
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
-          <div className="flex items-center gap-4">
-            <button className="w-10 h-10 rounded-full bg-[#f8fbfa] border border-[#d9e7e5] flex items-center justify-center text-[#637082] hover:bg-[#dff4f0] transition relative">
-              <span className="text-lg">🔔</span>
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">2</span>
-            </button>
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.href = '/profile'}>
-              <div className="w-10 h-10 bg-[#008f7a] rounded-full flex items-center justify-center text-white font-semibold">
-                {user?.name?.charAt(0) || '會'}
-              </div>
-              <span className="hidden sm:inline text-sm font-semibold text-[#0f2240]">{user?.name || '會員'}</span>
-              <span className="text-[#637082]">⌄</span>
-            </div>
-          </div>
+        <div className="header-actions">
+          <button className="notify-button" aria-label="查看通知">
+            <Icon name="bell" />
+            <span />
+          </button>
+          <button className="member-button" onClick={() => router.push('/profile')}>
+            <span className="member-avatar">{user?.name?.charAt(0) || '會'}</span>
+            <strong>{user?.name || '測試會員'}</strong>
+            <span className="chevron">⌄</span>
+          </button>
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-8 md:px-8">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#f0faf8] via-white to-[#e8f8f3] border border-[#d9e7e5]">
-          {/* Decorative leaves */}
-          <div className="absolute top-10 right-20 w-16 h-16 opacity-20">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /><path d="M12 22c-3-5-8-8-8-8" /></svg>
-          </div>
-          <div className="absolute bottom-20 right-10 w-12 h-12 opacity-15 rotate-45">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /></svg>
-          </div>
-          <div className="absolute top-1/3 left-10 w-8 h-8 opacity-10 -rotate-12">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7fb5a3" strokeWidth="1"><path d="M12 22c5-3 8-7 8-12V5c-5 0-9 3-12 8s-3 9-3 9z" /></svg>
-          </div>
-          
-          <div className="relative grid lg:grid-cols-12 gap-6 p-8 md:p-12">
-            {/* Left Content - 4 cols */}
-            <div className="lg:col-span-4 flex flex-col justify-center">
-              <p className="text-sm font-semibold text-[#008f7a] tracking-wider mb-3">CARE EVERYDAY, A BETTER TOMORROW</p>
-              <div className="relative">
-                <h1 className="text-4xl md:text-5xl font-bold text-[#063b59] mb-4 leading-tight">
-                  你的售後健康服務<br />我們一直都在
-                </h1>
-                <svg className="absolute -right-4 top-8 w-12 h-12 text-[#a8d5ba]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-              </div>
-              <p className="text-base text-[#637082] mb-8 leading-relaxed">
-                完成身份綁定與服務設定，這裡會整理由你你使用方式、<br />
-                每日計畫、健康追蹤與專屬關懷服務。
-              </p>
-              <div className="flex gap-4 mb-10">
-                <button
-                  className="px-8 py-4 bg-[#008f7a] text-white rounded-xl font-semibold text-base hover:opacity-90 transition flex items-center gap-2 shadow-lg"
-                  onClick={handlePrimaryStart}
-                >
-                  開始設定 <span>→</span>
-                </button>
-                <button className="px-8 py-4 border-2 border-[#008f7a] text-[#008f7a] rounded-xl font-semibold text-base hover:bg-[#dff4f0] transition flex items-center gap-2">
-                  了解更多 <span className="w-5 h-5 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-xs">▶</span>
-                </button>
-              </div>
-              <div className="flex gap-8">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-[#063b59]">專業團隊把關</p>
-                    <p className="text-xs text-[#637082]">安心有保障</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-[#063b59]">持續關懷服務</p>
-                    <p className="text-xs text-[#637082]">陪伴每一天</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#dff4f0] flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-[#063b59]">用科學守護健康</p>
-                    <p className="text-xs text-[#637082]">打造更好的自己</p>
-                  </div>
-                </div>
-              </div>
+      <div className="care-container">
+        <section className="new-hero">
+          <div className="hero-copy">
+            <p className="hero-eyebrow">CARE EVERYDAY, A BETTER TOMORROW</p>
+            <h1>你的售後健康服務<br />我們一直都在</h1>
+            <p>完成身份綁定與服務設定，這裡會整理由你使用方式、每日計畫、健康追蹤與專屬關懷服務。</p>
+            <div className="hero-buttons">
+              <button className="primary-action" onClick={() => router.push('/profile')}>開始設定 <span>→</span></button>
+              <button className="secondary-action" onClick={() => setPanel('intake')}>了解更多 <span className="play-dot">▶</span></button>
             </div>
+            <div className="hero-trust">
+              <div><Icon name="shield" /><strong>專業團隊把關</strong><span>安心有保障</span></div>
+              <div><Icon name="heart" /><strong>持續關懷服務</strong><span>陪伴每一天</span></div>
+              <div><Icon name="leaf" /><strong>用科學守護健康</strong><span>打造更好的自己</span></div>
+            </div>
+          </div>
 
-            {/* Middle - Product Image - 5 cols */}
-            <div className="lg:col-span-5 relative flex flex-col items-center justify-center">
-              {/* Decorative text */}
-              <div className="absolute top-8 right-8 text-right">
-                <p className="text-lg text-[#7fb5a3] font-medium">小小的堅持</p>
-                <p className="text-lg text-[#7fb5a3] font-medium">成就健康的你 ♡</p>
-              </div>
-              
-              {/* Marble platform */}
-              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-56 h-14 bg-gradient-to-b from-white to-[#e8f0ee] rounded-[50%] shadow-lg" />
-              
-              {/* Product image */}
-              <div className="relative z-10 mb-8">
-                {homepageImage ? (
-                  <img src={homepageImage} alt="產品圖" className="max-h-80 object-contain" />
-                ) : (
-                  <div className="w-48 h-64 bg-gradient-to-br from-white to-[#f0f7f5] rounded-2xl shadow-2xl flex flex-col items-center justify-center border border-[#d9e7e5]">
-                    <div className="w-16 h-16 bg-[#008f7a] rounded-full flex items-center justify-center mb-4">
-                      <span className="text-white font-bold text-xl">957</span>
-                    </div>
-                    <p className="text-lg font-bold text-[#063b59]">牛樟芝</p>
-                    <p className="text-sm text-[#637082]">菌絲體膠囊</p>
-                    <p className="text-xs text-[#637082] mt-2">Antrodia Cinnamomea</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Product benefits */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur rounded-full px-4 py-2 shadow-lg flex gap-4 z-20">
-                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 調節機能</span>
-                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 增強保護力</span>
-                <span className="text-xs font-semibold text-[#008f7a] flex items-center gap-1">✓ 每日健康守護</span>
-              </div>
-              
-              {/* Carousel dots */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#008f7a]" />
-                <span className="w-2 h-2 rounded-full bg-[#d9e7e5]" />
-                <span className="w-2 h-2 rounded-full bg-[#d9e7e5]" />
-              </div>
+          <div className="hero-product">
+            <div className="hand-note">小小的堅持<br />成就健康的你</div>
+            <div className="product-stage">
+              <ProductVisual imageUrl={homepageImage || productImage} />
             </div>
-
-            {/* Right - Progress Card - 3 cols */}
-            <div className="lg:col-span-3 flex items-center">
-              <div className="bg-white rounded-3xl border border-[#d9e7e5] p-6 w-full shadow-lg">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-[#e8f8f3] flex items-center justify-center">
-                    <svg className="w-5 h-5 text-[#008f7a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                  </div>
-                  <span className="font-semibold text-[#063b59]">啟用進度</span>
-                </div>
-                <div className="flex items-center justify-center mb-4">
-                  <div className="relative w-40 h-40">
-                    <svg className="w-40 h-40 transform -rotate-90">
-                      <circle cx="80" cy="80" r="70" stroke="#e8f8f3" strokeWidth="14" fill="none" />
-                      <circle cx="80" cy="80" r="70" stroke="#008f7a" strokeWidth="14" fill="none" strokeDasharray={`${2 * Math.PI * 70}`} strokeDashoffset={`${2 * Math.PI * 70 * (1 - progress / 100)}`} strokeLinecap="round" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-4xl font-bold text-[#063b59]">{progress}%</span>
-                      <span className="text-sm text-[#637082]">{isActivated ? '已完成' : `已完成 ${effectiveCompleted}/4`}</span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-center text-sm font-semibold text-[#063b59] mb-6">
-                  {isActivated ? '太棒了！你的售後健康服務已準備就緒' : '完成步驟即可啟用服務'}
-                </p>
-                <button className="w-full py-3 bg-[#008f7a] text-white rounded-xl font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
-                  查看我的設定 →
-                </button>
-              </div>
+            <div className="benefit-tags">
+              <span>調節機能</span>
+              <span>增強保護力</span>
+              <span>每日健康守護</span>
             </div>
+            <div className="hero-dots"><span className="active" /><span /><span /></div>
           </div>
+
+          <aside className="activation-card">
+            <div className="card-label"><Icon name="shield" />啟用進度</div>
+            <ProgressRing progress={progress} />
+            <h2>{isActivated ? '太棒了！' : '完成步驟即可啟用'}</h2>
+            <p>{isActivated ? '你的售後健康服務已準備就緒，我們會持續關注你的狀態。' : `目前已完成 ${effectiveCompleted}/4，完成後會開啟完整售後健康服務。`}</p>
+            <button onClick={() => router.push('/profile')}>查看我的設定 <span>→</span></button>
+          </aside>
         </section>
 
-        {/* Onboarding Steps */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {onboardingSteps.map((step, index) => {
-            const isStepCompleted = getStepStatus(index);
-            return (
-              <article 
-                className={`bg-white rounded-2xl border-2 p-5 cursor-pointer transition hover:shadow-lg ${
-                  isStepCompleted ? 'border-[#008f7a]' : 'border-[#d9e7e5]'
-                }`}
-                key={step.title}
-                onClick={() => handleStepClick(index)}
-              >
-                <div className="flex items-start gap-4">
-                  {/* Icon */}
-                  <div className={`w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center flex-shrink-0 text-white`}>
-                    {step.icon}
+        <section className="onboarding-grid" aria-label="啟用步驟">
+          {stepStates.map((step, index) => (
+            <button className={`onboarding-card ${step.status ? 'completed' : ''} ${step.tone}`} key={step.title} onClick={step.action}>
+              <div className="step-icon-wrap"><Icon name={step.icon} /></div>
+              <div>
+                <span className="step-index">{String(index + 1).padStart(2, '0')}</span>
+                <h2>{step.title}</h2>
+                <p>{step.text}</p>
+                <span className="step-status">{step.status ? '已完成' : '待完成'}</span>
+              </div>
+              <span className="step-arrow">›</span>
+            </button>
+          ))}
+        </section>
+
+        {isActivated && (
+          <>
+            <section className="top-dashboard">
+              <article className="recommended-card">
+                <div className="section-tag"><Icon name="shield" />精選商品｜RECOMMENDED</div>
+                <div className="recommended-body">
+                  <div className="product-photo-panel">
+                    <ProductVisual imageUrl={productImage || homepageImage} compact />
+                    <span className="stamp-text">Natural Health<br />Better Life</span>
                   </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="text-sm font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</span>
-                      {isStepCompleted && (
-                        <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
-                      )}
+                  <div className="recommended-copy">
+                    <span className="status-chip">已完成啟用</span>
+                    <h2>{productData?.name || '957 牛樟芝精華膠囊'}</h2>
+                    <p>已為你整理出相關健康保健建議，完成歸戶後即可開始。</p>
+                    <div className="benefit-row">
+                      <span><Icon name="leaf" />日常保健</span>
+                      <span><Icon name="shield" />調節機能</span>
+                      <span><Icon name="heart" />增強保護力</span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#063b59] mb-2">{step.title}</h3>
-                    <p className="text-sm text-[#637082] mb-1">{step.text}</p>
-                    <p className="text-sm text-[#637082] mb-4">{step.subtext}</p>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm font-semibold ${isStepCompleted ? 'text-[#008f7a]' : 'text-[#637082]'}`}>
-                        {isStepCompleted ? '已完成' : '待完成'}
-                      </span>
-                      {!isStepCompleted && (
-                        <span className="text-[#637082]">›</span>
-                      )}
+                    <div className="usage-summary">
+                      <div><small>建議時機</small><strong>{productData?.usage?.suggestedTime || '早餐後、晚餐後'}</strong></div>
+                      <div><small>建議用量</small><strong>{productData?.usage?.interval || '至少 120 分鐘'}</strong></div>
                     </div>
+                    <button className="primary-action compact" onClick={() => setShowUsageModal(true)}>查看使用方式 <span>→</span></button>
                   </div>
                 </div>
               </article>
-            );
-          })}
-        </section>
 
-        {/* Product & Daily Plan */}
-        <section className="grid md:grid-cols-2 gap-6">
-          {/* Product Card */}
-          <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">推薦商品 | RECOMMENDED</span>
-            </div>
-            <div className="flex gap-6">
-              <div className="w-32 h-32 flex-shrink-0">
-                {productImage ? (
-                  <img src={productImage} alt="商品圖" className="w-full h-full object-contain rounded-xl" />
-                ) : (
-                  <div className="w-full h-full bg-[#e8f8f3] rounded-xl flex items-center justify-center">
-                    <span className="text-4xl">📦</span>
-                  </div>
-                )}
+              <article className="daily-card">
+                <div>
+                  <div className="section-tag">今日計畫</div>
+                  <h2>每日使用提醒</h2>
+                  <p>設定開始使用日期，今日計畫會自動產生。讓健康成為一種習慣！</p>
+                  <button className="primary-action compact" onClick={() => router.push('/health')}>查看今日計畫 <span>→</span></button>
+                </div>
+                <div className="daily-visual"><span>健康生活<br />從今天開始</span></div>
+                <div className="tool-grid">
+                  {dashboardTools.map((tool) => (
+                    <div key={tool.title}><Icon name={tool.icon} /><strong>{tool.title}</strong><span>{tool.desc}</span></div>
+                  ))}
+                </div>
+              </article>
+            </section>
+
+            <section className="lower-dashboard">
+              <article className="assistant-intro">
+                <div className="section-tag">AI 商品小助手</div>
+                <h2>想了解商品<br />怎麼使用？</h2>
+                <p>使用者可以直接詢問商品問題，由 AI 小助手在回覆中說明一般食用方式，並結合官方資料提供完整、正確的建議。</p>
+                <div className="query-topics" aria-label="可詢問主題">
+                  <span>一般食用方式</span>
+                  <span>適合族群</span>
+                  <span>搭配建議</span>
+                  <span>進階搭配商品</span>
+                </div>
+              </article>
+
+              <article className="chat-card">
+                <div className="chat-title"><span><Icon name="ai" /></span><h2>AI 智能問答</h2></div>
+                <div className="chat-window">
+                  {chatMessages.map((message, index) => (
+                    <div className={`chat-line ${message.role}`} key={`${message.role}-${index}`}>
+                      {message.role === 'ai' && <span className="bot-dot"><Icon name="ai" /></span>}
+                      <p>{message.text}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="chat-input">
+                  <input
+                    value={chatInput}
+                    onChange={(event) => setChatInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') handleSendMessage();
+                    }}
+                    placeholder="輸入你的問題..."
+                  />
+                  <button aria-label="送出問題" onClick={handleSendMessage}><Icon name="send" /></button>
+                </div>
+              </article>
+
+              <article className="tracking-card">
+                <div className="section-tag">7 Day 健康追蹤</div>
+                <h2>最近 7 天，<br />您的狀況如何？</h2>
+                <p>持續紀錄有助於我們提供更精準的關懷與建議。</p>
+                <div className="line-chart" aria-label="7 天健康趨勢">
+                  <svg viewBox="0 0 420 150" preserveAspectRatio="none">
+                    <path d="M20 110 C78 90 102 90 150 70 S235 104 280 58 355 48 400 22" />
+                    {[20, 85, 150, 215, 280, 340, 400].map((x, index) => (
+                      <circle key={x} cx={x} cy={[110, 92, 70, 86, 58, 44, 22][index]} r="6" />
+                    ))}
+                  </svg>
+                  <div>{['週一', '週二', '週三', '週四', '週五', '週六', '週日'].map((day) => <span key={day}>{day}</span>)}</div>
+                  <strong>Day 7</strong>
+                </div>
+                <div className="health-actions">
+                  <button className="good" onClick={() => router.push('/health')}><span>✓</span><strong>狀況穩定</strong><small>一切都很好</small></button>
+                  <button className="help" onClick={() => router.push('/health')}><span>♡</span><strong>我有不適</strong><small>需要協助</small></button>
+                </div>
+              </article>
+            </section>
+
+            <section className="advisor-strip">
+              <div className="advisor-main">
+                <span><Icon name="headset" /></span>
+                <div>
+                  <h2>需要專人協助嗎？</h2>
+                  <p>若有用藥、特殊疾病，或在使用上有任何不適，請透過此處聯繫顧問，我們將盡快為您服務。</p>
+                  <button className="primary-action compact" onClick={() => setPanel('advisor')}>送出顧問諮詢 <span>→</span></button>
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-[#063b59] mb-2">{productData?.name || '957 牛樟芝精華膠囊'}</h3>
-                <p className="text-sm text-[#637082] mb-4">已為你整理由相關健康保健建議，完成帳戶後即可開始。</p>
-                <div className="flex gap-4 mb-4">
-                  <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
-                    日常保健
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
-                    調節機能
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-[#637082]">
-                    <span className="w-4 h-4 rounded-full bg-[#e8f8f3] flex items-center justify-center text-[#008f7a] text-xs">✓</span>
-                    增強保護力
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-[#f8fbfa] rounded-lg p-3">
-                    <small className="text-xs text-[#637082]">建議時機</small>
-                    <p className="text-sm font-semibold text-[#063b59]">{productData?.usage?.suggestedTime || '早餐後、晚餐後'}</p>
-                  </div>
-                  <div className="bg-[#f8fbfa] rounded-lg p-3">
-                    <small className="text-xs text-[#637082]">間隔時間</small>
-                    <p className="text-sm font-semibold text-[#063b59]">{productData?.usage?.interval || '至少 120 分鐘'}</p>
-                  </div>
-                </div>
-                <button className="w-full py-3 bg-[#008f7a] text-white rounded-xl font-semibold hover:opacity-90 transition flex items-center justify-center gap-2" onClick={handleShowUsage}>
-                  查看使用方式 →
-                </button>
+              <div className="advisor-points">
+                <div><Icon name="chat" /><strong>專業顧問團隊</strong><span>一對一個人化建議</span></div>
+                <div><Icon name="user" /><strong>隱私保護</strong><span>資料安全有保障</span></div>
+                <div><Icon name="shield" /><strong>貼心服務</strong><span>讓你健康安心</span></div>
               </div>
-            </div>
-          </article>
+            </section>
+          </>
+        )}
 
-          {/* Daily Plan Card */}
-          <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">今日計畫</span>
-            </div>
-            <h3 className="text-xl font-bold text-[#063b59] mb-2">每日使用提醒</h3>
-            <p className="text-sm text-[#637082] mb-6">設定開始使用日後，今日計畫會自動產生。</p>
-            <button className="w-full py-3 bg-[#008f7a] text-white rounded-xl font-semibold hover:opacity-90 transition mb-6 flex items-center justify-center gap-2">
-              查看今日計畫 →
-            </button>
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { icon: '⏰', title: '服用提醒', desc: '不錯過每日進度' },
-                { icon: '📊', title: '計畫追蹤', desc: '掌握每日狀況' },
-                { icon: '📝', title: '數據記錄', desc: '記錄健康數據' },
-                { icon: '👨‍⚕️', title: '專業關懷', desc: '顧問全程陪伴' },
-              ].map((item) => (
-                <div key={item.title} className="text-center">
-                  <div className="w-12 h-12 mx-auto bg-[#e8f8f3] rounded-xl flex items-center justify-center mb-2">
-                    <span className="text-xl">{item.icon}</span>
-                  </div>
-                  <p className="text-xs font-semibold text-[#063b59]">{item.title}</p>
-                  <p className="text-xs text-[#637082] mt-1">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </article>
-        </section>
-
-        {/* AI Assistant & Chat & Health Tracking */}
-        <section className="grid md:grid-cols-3 gap-6">
-          {/* AI Product Assistant */}
-          <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">AI 商品小助手</span>
-            </div>
-            <h3 className="text-xl font-bold text-[#063b59] mb-2">想了解商品<br />怎麼使用？</h3>
-            <p className="text-sm text-[#637082] mb-6">使用者可以直接詢問商品問題，由 AI 小助手在回覆中說明一般食用方式，並結合官方資料提供完整說明。</p>
-            <div className="flex flex-wrap gap-2">
-              {assistantExamples.map((example) => (
-                <span key={example} className="px-4 py-2 bg-[#e8f8f3] text-[#008f7a] rounded-full text-sm font-semibold cursor-pointer hover:bg-[#d0ede5] transition">
-                  {example}
-                </span>
-              ))}
-            </div>
-          </article>
-
-          {/* AI Chat */}
-          <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-[#008f7a] flex items-center justify-center text-white font-bold text-sm">AI</div>
-              <h3 className="text-lg font-bold text-[#063b59]">AI 智能問答</h3>
-            </div>
-            <div className="space-y-4 mb-4 max-h-48 overflow-y-auto">
-              {chatMessages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    msg.role === 'user' 
-                      ? 'bg-[#008f7a] text-white' 
-                      : 'bg-[#f8fbfa] text-[#0f2240]'
-                  }`}>
-                    <p className="text-sm">{msg.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="輸入你的問題..."
-                className="flex-1 px-4 py-3 border border-[#d9e7e5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#008f7a]"
-              />
-              <button 
-                onClick={handleSendMessage}
-                className="w-12 h-12 bg-[#008f7a] text-white rounded-xl flex items-center justify-center hover:opacity-90 transition"
-              >
-                →
-              </button>
-            </div>
-          </article>
-
-          {/* Health Tracking */}
-          <article className="bg-white rounded-3xl border border-[#d9e7e5] p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-[#e8f8f3] text-[#008f7a] rounded-full text-xs font-semibold">7 Day 健康追蹤</span>
-            </div>
-            <h3 className="text-xl font-bold text-[#063b59] mb-2">最近 7 天，<br />您的狀況如何？</h3>
-            <p className="text-sm text-[#637082] mb-4">持續回報有助於我們提供更精準的關懷與建議。</p>
-            
-            {/* Simple Chart */}
-            <div className="h-24 mb-4 flex items-end justify-between gap-1 px-2">
-              {[40, 60, 45, 70, 55, 80, 65].map((height, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center">
-                  <div className="w-full bg-gradient-to-t from-[#008f7a] to-[#00a896] rounded-t-lg" style={{ height: `${height}%` }} />
-                  <span className="text-xs text-[#637082] mt-1">{['一', '二', '三', '四', '五', '六', '日'][idx]}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                className="py-4 bg-[#e8f8f3] text-[#008f7a] rounded-xl font-semibold hover:bg-[#d0ede5] transition flex flex-col items-center gap-1"
-                onClick={() => { setPanel('health'); setTimeout(() => window.location.href = '/health', 500); }}
-              >
-                <span className="text-lg">✓</span>
-                <span>狀況穩定</span>
-                <span className="text-xs font-normal">一切都很好</span>
-              </button>
-              <button 
-                className="py-4 bg-[#fff7ed] text-[#c45b2b] rounded-xl font-semibold hover:bg-[#ffe8d6] transition flex flex-col items-center gap-1"
-                onClick={() => { setPanel('health'); setTimeout(() => window.location.href = '/health', 500); }}
-              >
-                <span className="text-lg">♡</span>
-                <span>我有不適</span>
-                <span className="text-xs font-normal">需要協助</span>
-              </button>
-            </div>
-          </article>
-        </section>
-
-        {/* Consultant CTA */}
-        <section className="bg-gradient-to-br from-[#008f7a] to-[#006d67] rounded-3xl p-8 md:p-12 text-white">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+        {!isActivated && (
+          <section className="locked-note">
+            <Icon name="shield" />
             <div>
-              <h2 className="text-3xl font-bold mb-4">需要專人協助嗎？</h2>
-              <p className="text-[#cff3e8] mb-6 leading-relaxed">
-                若有用藥、特殊疾病、報告異常或使用後不適，<br />
-                建議透過此處聯繫顧問，我們將盡快為您服務。
-              </p>
-              <button 
-                className="px-8 py-4 bg-white text-[#008f7a] rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2"
-                onClick={() => setPanel('advisor')}
-              >
-                送出顧問諮詢 →
-              </button>
+              <strong>完成四個步驟後，系統會開啟完整健康服務首頁。</strong>
+              <p>商品建議、每日計畫、AI 商品小助理、健康追蹤與顧問諮詢會在啟用後顯示。</p>
             </div>
-            <div className="flex justify-end gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-3">
-                  <span className="text-2xl">👨‍⚕️</span>
-                </div>
-                <p className="font-semibold">專業顧問團隊</p>
-                <p className="text-sm text-[#cff3e8]">一對一個人化建議</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-3">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <p className="font-semibold">隱私保護</p>
-                <p className="text-sm text-[#cff3e8]">資料安全有保障</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-3">
-                  <span className="text-2xl">❤️</span>
-                </div>
-                <p className="font-semibold">貼心服務</p>
-                <p className="text-sm text-[#cff3e8]">讓您健康安心</p>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Footer */}
-        <footer className="bg-white rounded-3xl border border-[#d9e7e5] p-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#008f7a] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">957</span>
-              </div>
-              <div>
-                <p className="font-bold text-[#063b59]">957 After-Sales Care</p>
-                <p className="text-sm text-[#637082]">用關心，陪你更健康</p>
-              </div>
-            </div>
-            <div className="flex gap-8">
-              <a href="#" className="text-[#637082] hover:text-[#008f7a] transition">關於我們</a>
-              <a href="#" className="text-[#637082] hover:text-[#008f7a] transition">隱私權政策</a>
-              <a href="#" className="text-[#637082] hover:text-[#008f7a] transition">服務條款</a>
-              <a href="#" className="text-[#637082] hover:text-[#008f7a] transition">聯絡我們</a>
-            </div>
-            <p className="text-sm text-[#637082]">© 2026 957 After-Sales Care. 版權所有</p>
-          </div>
+        <footer className="care-footer">
+          <div><BrandMark /><div><strong>957 After-Sales Care</strong><span>用關心，陪你更健康</span></div></div>
+          <nav>
+            <a href="#">關於我們</a>
+            <a href="#">隱私權政策</a>
+            <a href="#">服務條款</a>
+            <a href="#">聯絡我們</a>
+          </nav>
+          <p>© 2026 957 After-Sales Care. 版權所有</p>
         </footer>
       </div>
 
-      {/* Floating Panel */}
       <aside className={panel === 'none' ? 'floating-panel hidden' : 'floating-panel'}>
-        <button className="close-button" onClick={() => setPanel('none')} aria-label="關閉">
-          ×
-        </button>
+        <button className="close-button" onClick={() => setPanel('none')} aria-label="關閉">×</button>
         {panel === 'intake' ? (
           <>
             <div className="section-pill">AI 初始評估</div>
@@ -727,22 +499,10 @@ export default function Home() {
             <p>Demo 版先呈現 AI 問答流程。正式版會將回覆寫入會員基礎檔案，供商品建議、健康追蹤與顧問派單使用。</p>
             <div className="question-stack">
               {intakeQuestions.map((question, index) => (
-                <label key={question}>
-                  <span>{index + 1}. {question}</span>
-                  <input placeholder="請輸入回覆" />
-                </label>
+                <label key={question}><span>{index + 1}. {question}</span><input placeholder="請輸入回覆" /></label>
               ))}
             </div>
-            <button
-              className="primary-button full"
-              onClick={() => {
-                setCompleted(4);
-                setPanel('none');
-                setAiAssessed(true);
-              }}
-            >
-              完成評估並啟用服務
-            </button>
+            <button className="primary-button full" onClick={() => { setPanel('none'); setAiAssessed(true); }}>完成評估並啟用服務</button>
           </>
         ) : panel === 'health' ? (
           <>
@@ -751,13 +511,10 @@ export default function Home() {
             <p>Demo 版先呈現問答流程，正式版會寫入會員健康紀錄並觸發顧問派單規則。</p>
             <div className="question-stack">
               {aiQuestions.map((question, index) => (
-                <label key={question}>
-                  <span>{index + 1}. {question}</span>
-                  <input placeholder="請輸入回覆" />
-                </label>
+                <label key={question}><span>{index + 1}. {question}</span><input placeholder="請輸入回覆" /></label>
               ))}
             </div>
-            <button className="primary-button full">送出回報</button>
+            <button className="primary-button full" onClick={() => setPanel('none')}>送出回報</button>
           </>
         ) : (
           <>
@@ -769,110 +526,42 @@ export default function Home() {
               <span>會員來源：隨貨 QR-code</span>
               <span>資料來源：蝦皮訂單 Excel 匯入</span>
             </div>
-            <button className="primary-button full">建立諮詢案件</button>
+            <button className="primary-button full" onClick={() => setPanel('none')}>建立諮詢案件</button>
           </>
         )}
       </aside>
 
-      {/* Usage Modal */}
       {showUsageModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-[#0f2240] mb-4">{productData?.name || '957 牛樟芝精華膠囊'}使用方式</h2>
-            
-            <div className="space-y-6">
-              <div className="bg-[#f8fbfa] rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-[#0f2240] mb-3">基本資訊</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-[#637082] mb-1">建議使用時段</label>
-                    <p className="text-[#0f2240]">{productData?.usage?.suggestedTime || '早餐後、晚餐後'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-[#637082] mb-1">每次用量</label>
-                    <p className="text-[#0f2240]">{productData?.usage?.dosage || '1-2 顆'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-[#637082] mb-1">用藥間隔</label>
-                    <p className="text-[#0f2240]">{productData?.usage?.interval || '至少 120 分鐘'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-[#637082] mb-1">每日總量</label>
-                    <p className="text-[#0f2240]">{productData?.usage?.dailyMax || '不超過 4 顆'}</p>
-                  </div>
-                </div>
+        <div className="usage-modal" role="dialog" aria-modal="true" aria-labelledby="usage-title">
+          <div>
+            <h2 id="usage-title">{productData?.name || '957 牛樟芝精華膠囊'}使用方式</h2>
+            <section>
+              <h3>基本資訊</h3>
+              <div className="usage-modal-grid">
+                <div><small>建議使用時段</small><p>{productData?.usage?.suggestedTime || '早餐後、晚餐後'}</p></div>
+                <div><small>每次用量</small><p>{productData?.usage?.dosage || '1-2 顆'}</p></div>
+                <div><small>用藥間隔</small><p>{productData?.usage?.interval || '至少 120 分鐘'}</p></div>
+                <div><small>每日總量</small><p>{productData?.usage?.dailyMax || '不超過 4 顆'}</p></div>
               </div>
-
-              <div className="bg-[#f8fbfa] rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-[#0f2240] mb-3">使用注意事項</h3>
-                <ul className="space-y-2 text-[#0f2240]">
-                  {productData?.warnings?.map((warning: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-[#008f7a] mt-1">•</span>
-                      <span>{warning}</span>
-                    </li>
-                  )) || (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#008f7a] mt-1">•</span>
-                        <span>請用溫開水送服，避免空腹服用</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#008f7a] mt-1">•</span>
-                        <span>建議飯後 30 分鐘內服用</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#008f7a] mt-1">•</span>
-                        <span>與其他藥物間隔至少 2 小時</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#008f7a] mt-1">•</span>
-                        <span>孕期、哺乳期或特殊疾病者請諮詢醫師</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#008f7a] mt-1">•</span>
-                        <span>避免與咖啡、茶、酒精同時服用</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
-              </div>
-
-              <div className="bg-[#f8fbfa] rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-[#0f2240] mb-3">儲存方式</h3>
-                <ul className="space-y-2 text-[#0f2240]">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#008f7a] mt-1">•</span>
-                    <span>存放地點：{productData?.storage?.location || '陰涼乾燥處'}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#008f7a] mt-1">•</span>
-                    <span>溫度要求：{productData?.storage?.temperature || '常溫'}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#008f7a] mt-1">•</span>
-                    <span>濕度要求：{productData?.storage?.humidity || '避免高濕度'}</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-[#dff4f0] rounded-lg p-6 border border-[#008f7a]">
-                <h3 className="text-lg font-semibold text-[#0f2240] mb-3">溫馨提醒</h3>
-                <p className="text-[#0f2240]">
-                  本產品為保健食品，無法替代正規醫療。如有任何健康疑問，請諮詢專業醫師。
-                  持續使用建議搭配健康的生活作息和均衡飲食，效果更佳。
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 mt-6">
-              <button
-                onClick={() => setShowUsageModal(false)}
-                className="flex-1 px-6 py-3 border border-[#d9e7e5] text-[#0f2240] rounded-lg font-semibold hover:bg-gray-50 transition"
-              >
-                關閉
-              </button>
-            </div>
+            </section>
+            <section>
+              <h3>使用注意事項</h3>
+              <ul>
+                {(productData?.warnings || ['請用溫開水送服，避免空腹服用', '建議飯後 30 分鐘內服用', '與其他藥物間隔至少 2 小時', '孕期、哺乳期或特殊疾病者請諮詢醫師', '避免與咖啡、茶、酒精同時服用']).map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </section>
+            <section>
+              <h3>儲存方式</h3>
+              <ul>
+                <li>存放地點：{productData?.storage?.location || '陰涼乾燥處'}</li>
+                <li>溫度要求：{productData?.storage?.temperature || '常溫'}</li>
+                <li>濕度要求：{productData?.storage?.humidity || '避免高濕度'}</li>
+              </ul>
+            </section>
+            <p className="usage-reminder">本產品為保健食品，無法替代正規醫療。如有任何健康疑問，請諮詢專業醫師。</p>
+            <button onClick={() => setShowUsageModal(false)}>關閉</button>
           </div>
         </div>
       )}
