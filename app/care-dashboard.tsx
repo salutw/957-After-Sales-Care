@@ -3,7 +3,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import MainNav from './components/MainNav';
 
 const onboardingSteps = [
   {
@@ -210,6 +209,34 @@ export default function Home() {
               <p className="text-xs text-[#637082]">用關心，陪你更健康</p>
             </div>
           </div>
+
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            {[
+              { label: '首頁', href: '/' },
+              { label: '訂單管理', href: '/orders' },
+              { label: '健康記錄', href: '/health' },
+              { label: '顧問諮詢', href: '/advisor' },
+              { label: '個人資料', href: '/profile' },
+              { label: '管理後台', href: '/admin' },
+            ].map((item) => {
+              const isActive = item.href === '/' ? true : false;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-semibold transition ${
+                    isActive
+                      ? 'text-[#008f7a]'
+                      : 'text-[#637082] hover:text-[#008f7a]'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </nav>
+
           <div className="flex items-center gap-4">
             <button className="w-10 h-10 rounded-full bg-[#f8fbfa] border border-[#d9e7e5] flex items-center justify-center text-[#637082] hover:bg-[#dff4f0] transition">
               <span className="text-lg">🔔</span>
@@ -226,7 +253,6 @@ export default function Home() {
       </header>
 
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-8 md:px-8">
-        <MainNav />
 
         {/* Hero Section */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white to-[#e8f8f3] border border-[#d9e7e5]">

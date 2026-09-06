@@ -3,34 +3,34 @@
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { label: '儀表板', href: '/', activeClass: 'bg-[#087e74] text-white' },
-  { label: '訂單管理', href: '/orders', activeClass: 'bg-[#087e74] text-white' },
-  { label: '健康記錄', href: '/health', activeClass: 'bg-[#087e74] text-white' },
-  { label: '顧問諮詢', href: '/advisor', activeClass: 'bg-[#087e74] text-white' },
-  { label: '個人資料', href: '/profile', activeClass: 'bg-[#087e74] text-white' },
-  { label: '管理後台', href: '/admin', activeClass: 'bg-[#087e74] text-white' },
+  { label: '首頁', href: '/' },
+  { label: '訂單管理', href: '/orders' },
+  { label: '健康記錄', href: '/health' },
+  { label: '顧問諮詢', href: '/advisor' },
+  { label: '個人資料', href: '/profile' },
+  { label: '管理後台', href: '/admin' },
 ];
 
 export default function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white rounded-xl shadow-sm border border-[#d9e7e5] p-4">
-      <div className="flex flex-wrap gap-2 justify-center">
+    <nav className="bg-white border-b border-[#d9e7e5]">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-center gap-8 px-5 md:px-8 py-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (
-            <button
+            <a
               key={item.href}
-              onClick={() => window.location.href = item.href}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+              href={item.href}
+              className={`text-sm font-semibold transition ${
                 isActive
-                  ? item.activeClass
-                  : 'hover:bg-[#f8fbfa] text-[#0f2240]'
+                  ? 'text-[#008f7a]'
+                  : 'text-[#637082] hover:text-[#008f7a]'
               }`}
             >
               {item.label}
-            </button>
+            </a>
           );
         })}
       </div>
