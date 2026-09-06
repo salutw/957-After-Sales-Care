@@ -2167,7 +2167,10 @@ export default function AdminPage() {
               {/* 輪播圖管理 */}
               <div className="bg-[#f8fbfa] rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-[#0f2240] mb-4">輪播圖管理</h3>
-                <p className="text-sm text-[#637082] mb-4">這些圖片會顯示在顧問諮詢等前台頁面的輪播區塊。</p>
+                <p className="text-sm text-[#637082] mb-2">這些圖片會顯示在顧問諮詢等前台頁面的輪播區塊。</p>
+                <p className="text-sm text-[#c45b2b] bg-[#fff7ed] border border-[#ffd8bd] rounded-lg px-4 py-2 mb-4">
+                  建議圖片尺寸：<strong>2100 × 900 px</strong>（21:9 橫幅比例）。圖片會以該比例顯示，超出部分會被裁切，請將重要內容放在圖片中央。
+                </p>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-[#0f2240] mb-2">新增輪播圖</label>

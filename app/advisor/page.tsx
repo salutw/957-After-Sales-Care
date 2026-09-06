@@ -153,7 +153,7 @@ export default function AdvisorPage() {
         {/* 輪播圖 */}
         {carouselImages.length > 0 ? (
           <div className="relative mb-8 rounded-2xl overflow-hidden shadow-lg border border-[#d9e7e5] bg-white">
-            <div className="relative h-48 md:h-64">
+            <div className="relative w-full" style={{ aspectRatio: '21 / 9' }}>
               {carouselImages.map((img, idx) => (
                 <img
                   key={idx}
