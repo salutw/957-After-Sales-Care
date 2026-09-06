@@ -458,14 +458,6 @@ export default function AdminPage() {
       storageHumidity: '',
       warnings: '',
     });
-      dosage: '',
-      interval: '',
-      dailyMax: '',
-      storageLocation: '',
-      storageTemperature: '',
-      storageHumidity: '',
-      warnings: '',
-    });
     setShowProductModal(true);
   };
 
