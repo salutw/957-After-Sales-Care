@@ -438,33 +438,38 @@ export default function Home() {
             const isStepCompleted = getStepStatus(index);
             return (
               <article 
-                className={`bg-white rounded-2xl border-2 p-5 cursor-pointer transition hover:shadow-lg relative ${
+                className={`bg-white rounded-2xl border-2 p-5 cursor-pointer transition hover:shadow-lg ${
                   isStepCompleted ? 'border-[#008f7a]' : 'border-[#d9e7e5]'
                 }`}
                 key={step.title}
                 onClick={() => handleStepClick(index)}
               >
-                {/* Step number */}
-                <div className="absolute top-4 right-4 text-sm font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</div>
-                
-                {/* Icon */}
-                <div className={`w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center mb-4 text-white`}>
-                  {step.icon}
-                </div>
-                
-                <h3 className="text-lg font-bold text-[#063b59] mb-2">{step.title}</h3>
-                <p className="text-sm text-[#637082] mb-1">{step.text}</p>
-                <p className="text-sm text-[#637082] mb-4">{step.subtext}</p>
-                
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm font-semibold ${isStepCompleted ? 'text-[#008f7a]' : 'text-[#637082]'}`}>
-                    {isStepCompleted ? '已完成' : '待完成'}
-                  </span>
-                  {isStepCompleted ? (
-                    <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
-                  ) : (
-                    <span className="text-[#637082]">›</span>
-                  )}
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <div className={`w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center flex-shrink-0 text-white`}>
+                    {step.icon}
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <span className="text-sm font-bold text-[#637082]">{String(index + 1).padStart(2, '0')}</span>
+                      {isStepCompleted && (
+                        <span className="w-6 h-6 rounded-full bg-[#008f7a] text-white flex items-center justify-center text-sm">✓</span>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-bold text-[#063b59] mb-2">{step.title}</h3>
+                    <p className="text-sm text-[#637082] mb-1">{step.text}</p>
+                    <p className="text-sm text-[#637082] mb-4">{step.subtext}</p>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-semibold ${isStepCompleted ? 'text-[#008f7a]' : 'text-[#637082]'}`}>
+                        {isStepCompleted ? '已完成' : '待完成'}
+                      </span>
+                      {!isStepCompleted && (
+                        <span className="text-[#637082]">›</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </article>
             );
